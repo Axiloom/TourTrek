@@ -6,41 +6,46 @@
     tools:context=".fragments.AddAttractionFragment">
 
     <!-- TODO: Update blank fragment layout -->
-    <TextView
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:orientation="vertical">
 
-    <Button
-        android:id="@+id/attraction_add_btn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Button" />
+        <EditText
+            android:id="@+id/attraction_cost_et"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="textPersonName" />
 
-    <EditText
-        android:id="@+id/attraction_location_et"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:inputType="textPersonName"
-        android:text="Name" />
+        <EditText
+            android:id="@+id/attraction_name_et"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="textPersonName" />
 
-    <TextView
-        android:id="@+id/attraction_cost_et"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="TextView" />
+        <EditText
+            android:id="@+id/attraction_description_et"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="textPersonName" />
 
-    <TextView
-        android:id="@+id/attraction_name_et"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="TextView" />
+        <EditText
+            android:id="@+id/attraction_location_et"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="textPersonName" />
 
-    <TextView
-        android:id="@+id/attraction_description_et"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="TextView" />
+        <Button
+            android:id="@+id/attraction_add_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Button" />
+
+    </LinearLayout>
 
 </FrameLayout>

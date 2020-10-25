@@ -1,61 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <ImageView
-        android:id="@+id/tour_cover_iv"
-        android:layout_width="match_parent"
-        android:layout_height="150dp"
-        android:scaleType="fitXY"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-
-    <TextView
-        android:id="@+id/tour_tour_name_tv"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:text="Example Tour"
-        android:paddingTop="20dp"
-        android:textAlignment="center"
-        android:textSize="30sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tour_cover_iv"
-        />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/tour_attractions_rv"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-    </androidx.recyclerview.widget.RecyclerView>
-
     <LinearLayout
-        android:id="@+id/tour_attractions_loading_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:gravity="center"
-        android:orientation="vertical"
-        android:visibility="visible">
+        android:orientation="vertical">
 
-        <ProgressBar
-            android:id="@+id/tour_attraction_loading_pb"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+        <ImageView
+            android:id="@+id/tour_cover_iv"
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
+            android:scaleType="fitXY" />
 
         <TextView
-            android:id="@+id/tour_attractions_loading_tv"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="20dp"
-            android:text="Loading Future Tours"
-            android:textSize="25sp" />
+            android:id="@+id/tour_tour_name_tv"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:paddingTop="20dp"
+            android:text="Example Tour"
+            android:textAlignment="center"
+            android:textSize="30sp" />
 
         <Button
             android:id="@+id/tour_attractions_btn"
@@ -63,6 +31,14 @@
             android:layout_height="wrap_content"
             android:text="Button" />
 
+        <ListView
+            android:id="@+id/attractions_lv"
+            android:layout_width="match_parent"
+            android:layout_height="473dp">
+
+        </ListView>
+
     </LinearLayout>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

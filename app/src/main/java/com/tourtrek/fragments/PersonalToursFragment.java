@@ -244,6 +244,7 @@ public class PersonalToursFragment extends Fragment {
 
                     // Add the selected tour to the view model so we can access the tour inside the fragment
                     tourViewModel.setSelectedTour(tour);
+                    MainActivity.user.setCurrentTourObj(tour);
 
                     // Display the tour selected
                     final FragmentTransaction ft = getParentFragmentManager().beginTransaction();
@@ -260,7 +261,7 @@ public class PersonalToursFragment extends Fragment {
 
                     // Add the selected tour to the view model so we can access the tour inside the fragment
                     tourViewModel.setSelectedTour(tour);
-
+                    MainActivity.user.setCurrentTourObj(tour);
                     // Display the tour selected
                     final FragmentTransaction ft = getParentFragmentManager().beginTransaction();
                     ft.replace(R.id.nav_host_fragment, new TourFragment(), "TourFragment");
@@ -276,7 +277,7 @@ public class PersonalToursFragment extends Fragment {
 
                     // Add the selected tour to the view model so we can access the tour inside the fragment
                     tourViewModel.setSelectedTour(tour);
-
+                    MainActivity.user.setCurrentTourObj(tour);
                     // Display the tour selected
                     final FragmentTransaction ft = getParentFragmentManager().beginTransaction();
                     ft.replace(R.id.nav_host_fragment, new TourFragment(), "TourFragment");

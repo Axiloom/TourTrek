@@ -14,6 +14,7 @@ public class User{
     private List<DocumentReference> tours;
     private List<DocumentReference> contacts;
     private DocumentReference currentTour; // to be updated when the user selects a tour
+    private Tour currentTourObj; // update when the user selects a tour
 
     /**
      * Empty constructor needed for firestore
@@ -135,5 +136,13 @@ public class User{
 
     public void setCurrentTour(DocumentReference currentTour) {
         this.currentTour = currentTour;
+    }
+
+    public Tour getCurrentTourObj() {
+        return currentTourObj;
+    }
+
+    public void setCurrentTourObj(Tour currentTourObj) {
+        this.currentTourObj = currentTourObj;
     }
 }

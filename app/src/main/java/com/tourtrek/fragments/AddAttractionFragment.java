@@ -6,6 +6,7 @@ import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -17,16 +18,26 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.tourtrek.R;
 import com.tourtrek.activities.MainActivity;
+import com.tourtrek.adapters.CurrentPersonalToursAdapter;
+import com.tourtrek.adapters.FuturePersonalToursAdapter;
+import com.tourtrek.adapters.PastPersonalToursAdapter;
 import com.tourtrek.data.Attraction;
 import com.tourtrek.data.Tour;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
- * This fragment corresponds to the user story for creating a custom attraction.
+ * This fragment corresponds to the user story for creating a custom attraction, including the subtask for adding an attraction.
  * It runs when a user selects the 'add attraction' option from within the fragment showing the list of attractions in a selected tour.
  * The fragment will consist of a form with text fields corresponding to Attraction variables to fill in and a button to collect
  * the contents of them and push the information to Firestore.
@@ -35,10 +46,10 @@ public class AddAttractionFragment extends Fragment {
 
     private static final String TAG = "AddAttractionFragment";
     private FirebaseAuth mAuth;
-    private String locationHint = "Address in the form: 330 N. Orchard St., Madison, WI, USA";
-    private String costHint = "US dollar cost estimate";
-    private String nameHint = "Attraction name: e.g. Hershel's donut shop, Road Runner Inn, etc.";
-    private String descriptionHint = "Description: e.g. Hershel's donut shop has an awesome array of sweet delights.";
+    final private String locationHint = "330 N. Orchard St., Madison, WI";
+    final private String costHint = "0";
+    final private String nameHint = "WID";
+    final private String descriptionHint = "Research center at UW-Madison";
     private EditText locationText;
     private EditText costText;
     private EditText nameText;
@@ -128,6 +139,9 @@ public class AddAttractionFragment extends Fragment {
 
                 // go back once the button is pressed
                 getActivity().getSupportFragmentManager().popBackStack();
+//                final FragmentTransaction ft = getParentFragmentManager().beginTransaction();
+//                ft.replace(R.id.nav_host_fragment, new PersonalToursFragment(), "PersonalToursFragment");
+//                ft.addToBackStack("PersonalToursFragment").commit();
             }
         });
     }
@@ -136,37 +150,45 @@ public class AddAttractionFragment extends Fragment {
         final FirebaseFirestore db = FirebaseFirestore.getInstance();
         final DocumentReference newAttractionDoc = db.collection("Attractions").document();     // omit the ID so that Firestore generates a unique one
         newAttractionDoc.set(attraction) // write the attraction to the new document
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        Log.d(TAG, "Attraction written to firestore");
+                .addOnCompleteListener(task -> {
+                    Log.d(TAG, "Attraction written to firestore");
 
-                        Tour currentTour = MainActivity.user.getCurrentTour().get().getResult().toObject(Tour.class); // get a Tour copy of the document
-                        currentTour.getAttractions().add(newAttractionDoc); // Add the new attraction to the Tour
-                        // Update the Firestore document with the new Tour object data
-                        MainActivity.user.getCurrentTour().set(currentTour);
+                    DocumentReference currentDocRef = getDocRefFromID(MainActivity.user.getCurrentTourObj().getTourUID(), "Tours", db);
+                    Task<DocumentSnapshot> task2 = currentDocRef.get();
+                    while (!task2.isComplete()){}
+                    Tour currentTour = task2.getResult().toObject(Tour.class); // get a Tour copy of the document
+                    currentTour.getAttractions().add(newAttractionDoc); // Add the new attraction to the Tour
+                    // Update the Firestore document with the new Tour object data
+                    task2.getResult().getReference().set(currentTour);
 
-                        //finish();
-                    }
+                    //finish();
                 })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
+                .addOnFailureListener(e -> {
 
-                    }
                 })
 
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
+                .addOnSuccessListener(aVoid -> {
 
-                    }
                 })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.w(TAG, "Error writing document");
-                    }
-                });
+                .addOnFailureListener(e -> Log.w(TAG, "Error writing document"));
+    }
+
+    private DocumentReference getDocRefFromID(String ID, String collection, FirebaseFirestore db){
+        // Setup collection reference
+        CollectionReference toursCollection = db.collection(collection);
+        // Query database
+        Task task = toursCollection.get();
+        while (!task.isComplete()){}
+        QuerySnapshot snapshot = (QuerySnapshot) task.getResult();
+        // Go through each document and compare the dates
+        for (DocumentSnapshot document : snapshot.getDocuments()) {
+            // First check that the document belongs to the user
+            DocumentReference currentRef = document.getReference();
+            if (document.toObject(Tour.class).getTourUID().equals(ID)){
+                System.out.println("REFAFDAAAAAAAAAAAAAAAAA\n");
+                return currentRef;
+            }
+        }
+        return null;
     }
 }
