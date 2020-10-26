@@ -4,6 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/colorSecondaryLight"
     android:orientation="vertical">
 
     <FrameLayout
@@ -27,8 +28,8 @@
                 android:layout_weight="1"
                 android:textSize="20sp"
                 android:text="Current Tours"
-                android:textAllCaps="false"
-                android:background="#DDDDDD"/>
+                android:background="@color/colorPrimary"
+                android:textAllCaps="false" />
 
             <FrameLayout
                 android:layout_width="match_parent"
@@ -64,6 +65,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Loading Current Tours"
+                        android:textColor="@color/colorAccent"
                         android:textSize="25sp"
                         android:layout_marginBottom="20dp" />
 
@@ -103,7 +105,7 @@
                 android:text="Future Tours"
                 android:textAllCaps="false"
                 android:textSize="20sp"
-                android:background="#DDDDDD"
+                android:background="@color/colorPrimary"
                 app:drawableRightCompat="@drawable/ic_baseline_add_24"
                 android:drawablePadding="10dip"
                 android:paddingLeft="55dp"
@@ -143,6 +145,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Loading Future Tours"
+                        android:textColor="@color/colorAccent"
                         android:textSize="25sp"
                         android:layout_marginBottom="20dp" />
 
@@ -181,7 +184,7 @@
                 android:textSize="20sp"
                 android:text="Past Tours"
                 android:textAllCaps="false"
-                android:background="#DDDDDD"/>
+                android:background="@color/colorPrimary"/>
 
             <FrameLayout
                 android:layout_width="match_parent"
@@ -218,6 +221,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Loading Past Tours"
+                        android:textColor="@color/colorAccent"
                         android:textSize="25sp"
                         android:layout_marginBottom="20dp" />
 
