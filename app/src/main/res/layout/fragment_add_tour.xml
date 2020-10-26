@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingLeft="16dp"
+    android:paddingTop="16dp"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:background="@color/colorSecondaryLight"
+    android:orientation="vertical">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginEnd="15dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginBottom="15dp"
+        android:background="@drawable/item_tour_bg">
+
+        <ImageView
+            android:id="@+id/add_tour_cover_iv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top"
+            android:scaleType="fitXY"
+            android:background="@drawable/item_tour_bg_img"
+            android:src="@drawable/ic_profile_black"/>
+
+        <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/add_tour_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal" >
+
+            <Button
+                android:id="@+id/add_tour_picture_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:maxWidth="150dp"
+                android:paddingEnd="10dp"
+                android:paddingTop="5dp"
+                android:paddingBottom="5dp"
+                android:paddingStart="10dp"
+                android:text="Choose Image"
+                android:textColor="#FFFFFF"
+                android:background="@drawable/item_tour_bg_img"
+                android:textSize="20sp"
+                android:gravity="left"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </FrameLayout>
+
+
+    <EditText
+        android:id="@+id/add_tour_name_et"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="0dp"
+        android:layout_marginEnd="24dp"
+        android:hint="Tour Name"
+        android:textColorHint="@color/colorAccent"
+        android:textSize="50dp"
+        android:textStyle="bold"
+        android:inputType="text"
+        android:selectAllOnFocus="true" />
+    <!--android:hint="@string/get_tour_name"-->
+
+    <EditText
+        android:id="@+id/add_location_et"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:hint="City, State"
+        android:textColorHint="@color/colorAccent"
+        android:selectAllOnFocus="true"/>
+    <!--android:hint="@string/prompt_location"-->
+
+
+    <EditText
+        android:id="@+id/add_cost_et"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:hint="$Cost"
+        android:textColorHint="@color/colorAccent"
+        android:inputType="numberDecimal"
+        android:selectAllOnFocus="true"/>
+    <!--android:hint="@string/prompt_cost"-->
+
+    <EditText
+        android:id="@+id/add_time_et"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:hint="Estimated Time"
+        android:textColorHint="@color/colorAccent"
+        android:selectAllOnFocus="true" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Attraction 1"
+                android:clickable="true">
+            </EditText>
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Attraction 2"
+                android:clickable="true">
+            </EditText>
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Attraction 3"
+                android:clickable="true">
+            </EditText>
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Attraction 4"
+                android:clickable="true">
+            </EditText><EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Attraction 5"
+            android:clickable="true">
+        </EditText>
+        </LinearLayout>
+    </ScrollView>
+
+    <TextView
+        android:id="@+id/add_error_tv"
+        android:layout_width="283dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="24dp"
+        android:textColor="#f00"
+        android:textAlignment="center"
+        android:layout_gravity="center"
+        android:visibility="gone" />
+
+    <ProgressBar
+        android:id="@+id/add_loading_pb"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="24dp"
+        android:layout_gravity="center"
+        android:indeterminate="true"
+        android:visibility="gone"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:weightSum="1.0">
+    <Button
+        android:id="@+id/add_add_attraction_btn"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:layout_gravity="center"
+        android:enabled="true"
+        android:layout_weight="0.5"
+        android:text="Add Attraction"
+        android:textColor="@color/colorAccent"
+        android:background="@color/colorSecondary"/>
+    <!--android:text="@string/action_update"-->
+
+    <Button
+        android:id="@+id/add_share_btn"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="24dp"
+        android:layout_gravity="center"
+        android:enabled="true"
+        android:layout_weight="0.5"
+        android:text="Share Tour"
+        android:textColor="@color/colorAccent"
+        android:background="@color/colorSecondary"/>
+    <!--android:text="@string/action_update"-->
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/add_submit_btn"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="24dp"
+        android:layout_gravity="center"
+        android:enabled="true"
+        android:text="Submit Tour"
+        android:textColor="@color/colorAccent"
+        android:background="@color/colorPrimaryDark"/>
+    <!--android:text="@string/action_update"-->
+
+
+</LinearLayout>
