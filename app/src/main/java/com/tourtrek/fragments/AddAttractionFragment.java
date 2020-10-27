@@ -159,7 +159,7 @@ public class AddAttractionFragment extends Fragment {
                     Tour currentTour = task2.getResult().toObject(Tour.class); // get a Tour copy of the document
                     currentTour.getAttractions().add(newAttractionDoc); // Add the new attraction to the Tour
                     // Update the Firestore document with the new Tour object data
-                    task2.getResult().getReference().set(currentTour);
+                    task2.getResult().getReference().set(currentTour).addOnSuccessListener(v->{});
 
                     //finish();
                 })
