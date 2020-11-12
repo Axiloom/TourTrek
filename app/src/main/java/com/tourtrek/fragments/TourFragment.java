@@ -513,39 +513,71 @@ public class TourFragment extends Fragment {
 
     /**
      * Remove the tour from the user's list of tours in the database and return to the prior screen
-     * // TODO attractions should also be removed
+     * // TODO deal with the problem of deleting a tour which is referenced by another user
+     *
      * @param view
      */
     public void setupDeleteTourButton(View view){
+        // only visible to a user with the tour in their list of tours
         if (tourViewModel.getSelectedTour().getTourUID() != null){
             deleteTourButton.setVisibility(View.VISIBLE);
         }
+
+        // delete listener
         deleteTourButton.setOnClickListener(v -> {
+
             String currentTourUID = tourViewModel.getSelectedTour().getTourUID();
             List<DocumentReference> tourRefs = MainActivity.user.getTours();
             FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-            for (int i = 0; i < tourRefs.size(); i++){
+            // only remove a tour which is private
+            if (!tourViewModel.getSelectedTour().isPubliclyAvailable()){
+                for (int i = 0; i < tourRefs.size(); i++){
 
-                if (tourRefs.get(i).getId().equals(currentTourUID)){
+                    if (tourRefs.get(i).getId().equals(currentTourUID)){
+                        // remove from the user
+                        MainActivity.user.getTours().remove(i);
 
-                    MainActivity.user.getTours().remove(i);
+                        // remove attractions in the tour in the DB
+                        db.collection("Tours").document(currentTourUID)
+                                .get()
+                                .addOnCompleteListener(task -> {
+                                    // get Tour object
+                                    Tour currentTour = task.getResult().toObject(Tour.class);
+                                    // iterate through each attraction document and delete it
+                                    for (int j = 0; j < currentTour.getAttractions().size(); j++){
+                                        db.collection("Attractions").document(
+                                                currentTour.getAttractions()
+                                                        .get(j)
+                                                        .getId())
+                                                .delete()
+                                                .addOnSuccessListener(v1 -> Log.d(TAG, "Attraction deleted"))
+                                                .addOnFailureListener(v2 -> Log.d(TAG, "Attraction could not be deleted"));
+                                    }
 
-                    // remove from the DB if not a public tour
-                    if (!tourViewModel.getSelectedTour().isPubliclyAvailable()){
-                        db.collection("Tours").document(tourViewModel.getSelectedTour()
-                                .getTourUID()).delete();
+                                    // remove the tour from the DB
+                                    task.getResult().getReference()
+                                            .delete()
+                                            .addOnCompleteListener(w -> {
+
+                                                // remove the tour from the user's DB entry
+                                                updateUser();
+
+                                                // toast message
+                                                Toast.makeText(getContext(), "Tour removed", Toast.LENGTH_SHORT).show();
+
+                                                // go back
+                                                getParentFragmentManager().popBackStack();
+                                            });
+                                });
+                        break;
                     }
-
-                    updateUser();
-
-                    Toast.makeText(getContext(), "Tour Removed", Toast.LENGTH_SHORT).show();
-
-                    getParentFragmentManager().popBackStack();
-                    break;
                 }
             }
-
+            // the tour is not private - error
+            else{
+                Toast.makeText(getContext(), "You cannot delete a public tour!", Toast.LENGTH_LONG).show();
+            }
         });
     }
 
@@ -630,5 +662,6 @@ public class TourFragment extends Fragment {
             .addOnFailureListener(e -> Log.w(TAG, "Error writing document"));
         });
     }
+
 }
 
