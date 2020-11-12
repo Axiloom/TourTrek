@@ -1,6 +1,7 @@
 package com.tourtrek.fragments;
 
 import androidx.activity.OnBackPressedCallback;
+import androidx.annotation.MainThread;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -53,6 +54,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import static com.tourtrek.utilities.Firestore.updateUser;
+
 public class TourFragment extends Fragment {
 
     private static final String TAG = "TourFragment";
@@ -66,6 +69,7 @@ public class TourFragment extends Fragment {
     private Button endDateButton;
     private EditText nameEditText;
     private Button updateTourButton;
+    private Button deleteTourButton;
     private TextView coverTextView;
     private CheckBox notificationsCheckBox;
     private CheckBox publicCheckBox;
@@ -106,6 +110,7 @@ public class TourFragment extends Fragment {
         startDateButton = tourView.findViewById(R.id.tour_start_date_btn);
         endDateButton = tourView.findViewById(R.id.tour_end_date_btn);
         updateTourButton = tourView.findViewById(R.id.tour_update_btn);
+        deleteTourButton = tourView.findViewById(R.id.tour_delete_btn);
         shareButton = tourView.findViewById(R.id.tour_share_btn);
         coverImageView = tourView.findViewById(R.id.tour_cover_iv);
         coverTextView = tourView.findViewById(R.id.tour_cover_tv);
@@ -273,6 +278,8 @@ public class TourFragment extends Fragment {
                 }
             }
         });
+
+        setupDeleteTourButton(tourView);
 
         return tourView;
     }
@@ -504,6 +511,44 @@ public class TourFragment extends Fragment {
                 });
     }
 
+    /**
+     * Remove the tour from the user's list of tours in the database and return to the prior screen
+     * // TODO attractions should also be removed
+     * @param view
+     */
+    public void setupDeleteTourButton(View view){
+        if (tourViewModel.getSelectedTour().getTourUID() != null){
+            deleteTourButton.setVisibility(View.VISIBLE);
+        }
+        deleteTourButton.setOnClickListener(v -> {
+            String currentTourUID = tourViewModel.getSelectedTour().getTourUID();
+            List<DocumentReference> tourRefs = MainActivity.user.getTours();
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+            for (int i = 0; i < tourRefs.size(); i++){
+
+                if (tourRefs.get(i).getId().equals(currentTourUID)){
+
+                    MainActivity.user.getTours().remove(i);
+
+                    // remove from the DB if not a public tour
+                    if (!tourViewModel.getSelectedTour().isPubliclyAvailable()){
+                        db.collection("Tours").document(tourViewModel.getSelectedTour()
+                                .getTourUID()).delete();
+                    }
+
+                    updateUser();
+
+                    Toast.makeText(getContext(), "Tour Removed", Toast.LENGTH_SHORT).show();
+
+                    getParentFragmentManager().popBackStack();
+                    break;
+                }
+            }
+
+        });
+    }
+
     public void setupUpdateTourButton(View view) {
 
         Button editTourUpdateButton = view.findViewById(R.id.tour_update_btn);
@@ -566,7 +611,7 @@ public class TourFragment extends Fragment {
                         Log.d(TAG, "Tour written to firestore");
 
                         // Update the user in the firestore
-                        Firestore.updateUser();
+                        updateUser();
 
                         if (tourViewModel.isNewTour()) {
                             Toast.makeText(getContext(), "Successfully Added Tour", Toast.LENGTH_SHORT).show();
