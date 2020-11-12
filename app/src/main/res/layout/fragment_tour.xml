@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="16dp"
-    android:background="@color/colorSecondaryLight">
+    android:background="@drawable/gradient">
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
@@ -49,7 +49,8 @@
                         android:paddingStart="10dp"
                         android:paddingTop="5dp"
                         android:text="Edit Image"
-                        android:textColor="#FFFFFF"
+                        android:textColor="#EEEEEE"
+                        android:textStyle="bold"
                         android:textSize="20sp"
                         app:layout_constraintLeft_toLeftOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
@@ -65,7 +66,7 @@
                 android:layout_marginEnd="24dp"
                 android:layout_marginStart="24dp"
                 android:padding="5dp"
-                android:background="#E4A561"
+                android:background="#EEEEEE"
                 android:hint="Tour Name"
                 android:inputType="text"
                 android:selectAllOnFocus="true"
@@ -84,6 +85,7 @@
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
                     android:text="Location:"
+                    android:textColor="@color/colorAccent"
                     android:textSize="25sp"
                     android:layout_marginStart="24dp" />
 
@@ -91,10 +93,11 @@
                     android:id="@+id/tour_location_et"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="#E4A561"
+                    android:background="#EEEEEE"
                     android:padding="5dp"
                     android:layout_marginEnd="24dp"
-                    android:textSize="25sp"
+                    android:textSize="20sp"
+                    android:textAlignment="center"
                     android:textColorHighlight="#AAAAAAAA"
                     android:hint="City, State"
                     android:selectAllOnFocus="true" />
@@ -112,6 +115,7 @@
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
                     android:text="Cost:"
+                    android:textColor="@color/colorAccent"
                     android:textSize="25sp"
                     android:layout_marginStart="24dp" />
 
@@ -121,8 +125,9 @@
                     android:layout_height="match_parent"
                     android:layout_marginEnd="24dp"
                     android:padding="5dp"
-                    android:background="#E4A561"
-                    android:textSize="25sp"
+                    android:background="#EEEEEE"
+                    android:textSize="20sp"
+                    android:textAlignment="center"
                     android:textColorHighlight="#AAAAAAAA"
                     android:hint="$0.00"
                     android:inputType="numberDecimal"
@@ -141,6 +146,7 @@
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
                     android:text="Start Date:"
+                    android:textColor="@color/colorAccent"
                     android:textSize="25sp"
                     android:layout_marginStart="24dp" />
 
@@ -149,7 +155,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="24dp"
-                    android:background="#E4A561"
+                    android:background="#EEEEEE"
                     android:textSize="20sp"
                     android:hint="Pick Date" />
 
@@ -166,6 +172,7 @@
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
                     android:text="End Date:"
+                    android:textColor="@color/colorAccent"
                     android:textSize="25sp"
                     android:layout_marginStart="24dp" />
 
@@ -174,7 +181,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="24dp"
-                    android:background="#E4A561"
+                    android:background="#EEEEEE"
                     android:textSize="20sp"
                     android:hint="Pick Date"/>
 
@@ -203,7 +210,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="266dp"
                     android:gravity="center"
-                    android:background="#E4A561"
+                    android:background="#EEEEEE"
                     android:orientation="vertical"
                     android:visibility="visible">
 
@@ -217,7 +224,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="20dp"
-                        android:text="Loading Current Attractions"
+                        android:text="Loading Attractions"
                         android:textSize="25sp" />
 
                 </LinearLayout>
@@ -231,7 +238,7 @@
                         android:id="@+id/tour_attractions_rv"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:background="#E4A561"
+                        android:background="#EEEEEE"
                         android:layout_marginEnd="8dp"
                         android:layout_marginStart="8dp"
                         android:layout_marginTop="8dp"
@@ -286,7 +293,7 @@
                     android:enabled="true"
                     android:text="Add Attraction"
                     android:textAllCaps="false"
-                    android:textColor="@color/colorAccent"
+                    android:textColor="#EEEEEE"
                     android:textStyle="bold" />
 
                 <Button
@@ -296,11 +303,11 @@
                     android:layout_gravity="center"
                     android:layout_marginEnd="24dp"
                     android:layout_weight="0.33"
-                    android:background="@color/colorPrimaryLight"
+                    android:background="@color/colorPrimaryDark"
                     android:enabled="true"
                     android:text="Share Tour"
                     android:textAllCaps="false"
-                    android:textColor="@color/colorAccent"
+                    android:textColor="#EEEEEE"
                     android:textStyle="bold" />
 
                 <Button
@@ -310,11 +317,11 @@
                     android:layout_gravity="center"
                     android:layout_marginEnd="24dp"
                     android:layout_weight=".33"
-                    android:background="@color/colorPrimaryDark"
+                    android:background="@color/colorAccent"
                     android:enabled="true"
                     android:text="Update Tour"
                     android:textAllCaps="false"
-                    android:textColor="@color/colorAccent"
+                    android:textColor="#EEEEEE"
                     android:textStyle="bold" />
 
                 <Button

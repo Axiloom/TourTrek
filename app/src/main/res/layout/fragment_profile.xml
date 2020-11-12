@@ -10,7 +10,7 @@
     <FrameLayout
         android:id="@+id/profile_top_panel_container"
         android:layout_width="match_parent"
-        android:layout_height="300dp"
+        android:layout_height="200dp"
         android:background="@drawable/border"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -32,8 +32,8 @@
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/profile_user_iv"
-            android:layout_width="150dp"
-            android:layout_height="150dp"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
             android:layout_marginTop="80dp"
             android:layout_gravity="center_horizontal"
             app:civ_border_color="#FF000000"

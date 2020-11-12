@@ -16,7 +16,7 @@
         android:layout_gravity="top"
         android:scaleType="fitXY"
         android:background="@drawable/item_tour_bg_img"
-        android:src="@drawable/ic_profile_black"/>
+        android:src="@drawable/ic_profile"/>
 
     <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"

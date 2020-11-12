@@ -85,7 +85,7 @@ public class ProfileFragment extends Fragment {
         Glide.with(this)
                 .load(MainActivity.user.getProfileImageURI())
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .placeholder(R.drawable.ic_profile_black)
+                .placeholder(R.drawable.ic_profile)
                 .circleCrop()
                 .into(profileUserImageView);
 

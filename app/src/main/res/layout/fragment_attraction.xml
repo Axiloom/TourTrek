@@ -50,7 +50,8 @@
                         android:paddingStart="10dp"
                         android:paddingTop="5dp"
                         android:text="Edit Image"
-                        android:textColor="#FFFFFF"
+                        android:textStyle="bold"
+                        android:textColor="#EEEEEE"
                         android:textSize="20sp"
                         app:layout_constraintLeft_toLeftOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
@@ -66,7 +67,7 @@
                 android:layout_marginEnd="24dp"
                 android:layout_marginStart="24dp"
                 android:padding="5dp"
-                android:background="#E4A561"
+                android:background="#EEEEEE"
                 android:hint="Attraction Name"
                 android:inputType="text"
                 android:selectAllOnFocus="true"
@@ -86,16 +87,18 @@
                     android:gravity="center_vertical"
                     android:text="Location:"
                     android:textSize="25sp"
+                    android:textColor="@color/colorAccent"
                     android:layout_marginStart="24dp" />
 
                 <EditText
                     android:id="@+id/attraction_location_et"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="#E4A561"
+                    android:background="#EEEEEE"
                     android:padding="5dp"
                     android:layout_marginEnd="24dp"
-                    android:textSize="25sp"
+                    android:textSize="20dp"
+                    android:textAlignment="center"
                     android:textColorHighlight="#AAAAAAAA"
                     android:hint="City, State"
                     android:selectAllOnFocus="true" />
@@ -113,6 +116,7 @@
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
                     android:text="Cost:"
+                    android:textColor="@color/colorAccent"
                     android:textSize="25sp"
                     android:layout_marginStart="24dp" />
 
@@ -122,8 +126,9 @@
                     android:layout_height="match_parent"
                     android:layout_marginEnd="24dp"
                     android:padding="5dp"
-                    android:background="#E4A561"
-                    android:textSize="25sp"
+                    android:background="#EEEEEE"
+                    android:textSize="20dp"
+                    android:textAlignment="center"
                     android:textColorHighlight="#AAAAAAAA"
                     android:hint="$0.00"
                     android:inputType="numberDecimal"
@@ -142,6 +147,7 @@
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
                     android:text="Start Date:"
+                    android:textColor="@color/colorAccent"
                     android:textSize="25sp"
                     android:layout_marginStart="24dp" />
 
@@ -150,7 +156,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="24dp"
-                    android:background="#E4A561"
+                    android:background="#EEEEEE"
                     android:textSize="20dp"
                     android:hint="Pick Date" />
 
@@ -167,6 +173,7 @@
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
                     android:text="Start Time:"
+                    android:textColor="@color/colorAccent"
                     android:textSize="25sp"
                     android:layout_marginStart="24dp" />
 
@@ -175,7 +182,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="24dp"
-                    android:background="#E4A561"
+                    android:background="#EEEEEE"
                     android:textSize="20dp"
                     android:hint="Pick Time"/>
 
@@ -192,6 +199,7 @@
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
                     android:text="End Date:"
+                    android:textColor="@color/colorAccent"
                     android:textSize="25sp"
                     android:layout_marginStart="24dp" />
 
@@ -200,7 +208,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="24dp"
-                    android:background="#E4A561"
+                    android:background="#EEEEEE"
                     android:textSize="20dp"
                     android:hint="Pick Date"
                     android:onClick="showDatePickerDialog" />
@@ -218,6 +226,7 @@
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
                     android:text="End Time:"
+                    android:textColor="@color/colorAccent"
                     android:textSize="25sp"
                     android:layout_marginStart="24dp" />
 
@@ -226,7 +235,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="24dp"
-                    android:background="#E4A561"
+                    android:background="#EEEEEE"
                     android:textSize="20dp"
                     android:hint="Pick Time"
                     android:onClick="showTimePickerDialog" />
@@ -243,8 +252,7 @@
                 android:gravity="center_horizontal"
                 android:text="Description"
                 android:textColor="@color/colorAccent"
-                android:textSize="20dp"
-                android:textStyle="bold"
+                android:textSize="25sp"
                 app:backgroundTint="@color/colorSecondaryLight" />
 
             <EditText
@@ -253,21 +261,22 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="24dp"
                 android:layout_marginEnd="24dp"
+                android:layout_marginTop="8dp"
                 android:layout_marginStart="24dp"
                 android:padding="10dp"
                 android:inputType="textMultiLine"
                 android:gravity="start"
-                android:background="#E4A561"
+                android:background="#EEEEEE"
                 android:textColorHighlight="#AAAAAAAA"
                 android:lines="5"
                 android:hint="Details"
+                android:textSize="20dp"
                 android:selectAllOnFocus="true" />
 
             <LinearLayout
                 android:id="@+id/attraction_buttons_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="15dp"
                 android:paddingBottom="20dp"
                 android:weightSum="1.0">
 

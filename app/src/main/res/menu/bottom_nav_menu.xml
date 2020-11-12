@@ -11,13 +11,13 @@
 
     <item
         android:id="@+id/navigation_tours"
-        android:icon="@drawable/ic_tourist_black"
+        android:icon="@drawable/ic_tourist"
         android:title="@string/title_tours"
         android:enabled="true"/>
 
     <item
         android:id="@+id/navigation_profile"
-        android:icon="@drawable/ic_profile_black"
+        android:icon="@drawable/ic_profile"
         android:title="@string/title_profile"
         android:enabled="true"/>
 
