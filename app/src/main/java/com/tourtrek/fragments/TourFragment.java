@@ -218,6 +218,7 @@ public class TourFragment extends Fragment implements AdapterView.OnItemSelected
         startDateButton.setEnabled(false);
         endDateButton.setEnabled(false);
         coverImageView.setClickable(false);
+        addAttractionButton.setVisibility(View.GONE);
         buttonsContainer.setVisibility(View.GONE);
         coverTextView.setVisibility(View.GONE);
         checkBoxesContainer.setVisibility(View.GONE);
@@ -540,6 +541,7 @@ public class TourFragment extends Fragment implements AdapterView.OnItemSelected
             startDateButton.setEnabled(true);
             endDateButton.setEnabled(true);
             coverImageView.setClickable(true);
+            addAttractionButton.setVisibility(View.VISIBLE);
             coverTextView.setVisibility(View.VISIBLE);
             buttonsContainer.setVisibility(View.VISIBLE);
             checkBoxesContainer.setVisibility(View.VISIBLE);
@@ -569,6 +571,7 @@ public class TourFragment extends Fragment implements AdapterView.OnItemSelected
             startDateButton.setEnabled(true);
             endDateButton.setEnabled(true);
             coverImageView.setClickable(true);
+            addAttractionButton.setVisibility(View.VISIBLE);
             coverTextView.setVisibility(View.VISIBLE);
             buttonsContainer.setVisibility(View.VISIBLE);
             checkBoxesContainer.setVisibility(View.VISIBLE);
