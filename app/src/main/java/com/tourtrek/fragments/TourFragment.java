@@ -84,7 +84,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import static com.tourtrek.utilities.Firestore.updateUser;
-// TODO - when a user imports a tour, they should get a copy of it as their own tour to manipulate
+// TODO - perhaps logic ought to be implemented preventing tours with the same name from being displayed in the market
+// TODO - cases to test = a non-user should not see the import button, clicking on your own tour in the market should not present the import button,
+// successful importation into personal tours, separatness of the two tours.
 
 public class TourFragment extends Fragment implements AdapterView.OnItemSelectedListener {
 
@@ -258,8 +260,12 @@ public class TourFragment extends Fragment implements AdapterView.OnItemSelected
         }
 
         // Check to see if this tour belongs to the user
-        if (MainActivity.user != null)
+        if (MainActivity.user != null) {
             tourIsUsers();
+        }
+        else{ // no user is logged in, so disable importing
+            tourImportButton.setVisibility(View.GONE);
+        }
 
         Glide.with(getContext())
                 .load(tourViewModel.getSelectedTour().getCoverImageURI())
@@ -355,6 +361,7 @@ public class TourFragment extends Fragment implements AdapterView.OnItemSelected
         });
 
         setupDeleteTourButton(tourView);
+        setupImportTourButton(tourView);
 
         return tourView;
     }
@@ -469,8 +476,52 @@ public class TourFragment extends Fragment implements AdapterView.OnItemSelected
     }
 
     /**
+     * Upon clicking the "Import Tour" button, a copy of the current tour should be added to the user's
+     * account.
+     * Precondition: The button should only be clicked on a tour in the marketplace. Such a tour already has a UID.
+     * @param tourView
+     */
+    private void setupImportTourButton(View tourView) {
+        tourImportButton.setOnClickListener(u -> {
+            // get the current tour
+            Tour tour = tourViewModel.getSelectedTour();
+
+            // create a new Firestore document
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+            DocumentReference newTourDoc = db.collection("Tours").document();
+
+            // set the ID of the tour object to that of the new document
+            // the original tour document in the Firestore will not be touched, so changing the ID should be fine
+            tour.setTourUID(newTourDoc.getId());
+            // set the new tour to private by default to avoid cluttering the tour market with it until
+            // after the user has had a chance to modify it
+            tour.setPubliclyAvailable(false);
+
+            // set the content of the new Firestore document
+            newTourDoc.set(tour).addOnCompleteListener(v -> {
+
+                Log.d(TAG, "The tour was imported.");
+//                Toast.makeText(getContext(), "The tour was imported.", Toast.LENGTH_LONG).show();
+
+            })
+                .addOnFailureListener(v1 -> {
+
+                    Log.d(TAG, "Tour importation failed.");
+//                    Toast.makeText(getContext(), "Tour importation failed.", Toast.LENGTH_LONG).show();
+
+                });
+
+            // add the tour to the user's list of tours
+            MainActivity.user.getTours().add(newTourDoc);
+            updateUser();
+
+            // go back
+            getParentFragmentManager().popBackStack();
+        });
+    }
+
+    /**
      * Retrieve all attractions belonging to this user
-     *
      */
     private void fetchAttractionsAsync() {
 
