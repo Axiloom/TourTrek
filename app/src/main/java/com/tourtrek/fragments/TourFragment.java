@@ -85,8 +85,10 @@ import java.util.List;
 import java.util.UUID;
 import static com.tourtrek.utilities.Firestore.updateUser;
 // TODO - perhaps logic ought to be implemented preventing tours with the same name from being displayed in the market
+// TODO - do the above through stopping a user from making a duplicate tour public and displaying a toast
+// TODO - add usernames to tours in the marketplace
 // TODO - cases to test = a non-user should not see the import button, clicking on your own tour in the market should not present the import button,
-// successful importation into personal tours, separatness of the two tours.
+// successful importation into personal tours, separation of the two tours.
 
 public class TourFragment extends Fragment implements AdapterView.OnItemSelectedListener {
 
