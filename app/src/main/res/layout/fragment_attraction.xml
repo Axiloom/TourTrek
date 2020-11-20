@@ -32,6 +32,23 @@
                     android:background="@drawable/item_tour_bg_img"
                     android:scaleType="fitXY" />
 
+                <LinearLayout
+                    android:id="@+id/attraction_cover_loading_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="24dp"
+                    android:layout_marginEnd="24dp"
+                    android:gravity="bottom|center"
+                    android:orientation="vertical"
+                    android:visibility="gone">
+
+                    <ProgressBar
+                        android:id="@+id/attraction_cover_loading_pb"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                </LinearLayout>
+
                 <FrameLayout
                     android:id="@+id/attraction_cover_container"
                     android:layout_width="match_parent"
@@ -59,21 +76,40 @@
 
             </FrameLayout>
 
-            <EditText
-                android:id="@+id/attraction_name_et"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="24dp"
-                android:layout_marginStart="24dp"
-                android:padding="5dp"
-                android:background="#EEEEEE"
-                android:hint="Attraction Name"
-                android:textColorHint="@color/colorPrimaryDark"
-                android:inputType="text"
-                android:selectAllOnFocus="true"
-                android:textColorHighlight="#AAAAAAAA"
-                android:textSize="30dp"
-                android:textStyle="bold" />
+                android:orientation="horizontal"
+                android:layout_marginTop="10dp">
+
+                <EditText
+                    android:id="@+id/attraction_name_et"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="15dp"
+                    android:layout_marginStart="24dp"
+                    android:maxWidth="250dp"
+                    android:padding="5dp"
+                    android:background="#EEEEEE"
+                    android:hint="Attraction Name"
+                    android:textColorHint="@color/colorPrimaryDark"
+                    android:inputType="textMultiLine"
+                    android:layout_weight="1"
+                    android:selectAllOnFocus="true"
+                    android:textColorHighlight="#AAAAAAAA"
+                    android:textSize="30dp"
+                    android:textStyle="bold" />
+
+                <ImageButton
+                    android:id="@+id/attraction_search_ib"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginEnd="24dp"
+                    android:src="@drawable/ic_baseline_search_24"/>
+
+            </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"

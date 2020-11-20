@@ -9,6 +9,7 @@ public class AttractionViewModel extends ViewModel {
 
     private MutableLiveData<Attraction> selectedAttraction = new MutableLiveData<>();
     private MutableLiveData<Boolean> isNewAttraction = new MutableLiveData<>();
+    private MutableLiveData<Boolean> returnedFromSearch = new MutableLiveData<>();
 
     public Attraction getSelectedAttraction() {
         return selectedAttraction.getValue();
@@ -27,5 +28,16 @@ public class AttractionViewModel extends ViewModel {
 
     public void setIsNewAttraction(Boolean isNewAttraction) {
         this.isNewAttraction.setValue(isNewAttraction);
+    }
+
+    public boolean returnedFromSearch() {
+        if (returnedFromSearch.getValue() == null) {
+            returnedFromSearch.setValue(false);
+        }
+        return returnedFromSearch.getValue();
+    }
+
+    public void setReturnedFromSearch(boolean returnedFromSearch) {
+        this.returnedFromSearch.setValue(returnedFromSearch);
     }
 }

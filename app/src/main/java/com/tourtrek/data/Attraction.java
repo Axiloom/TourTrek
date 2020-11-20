@@ -1,5 +1,7 @@
 package com.tourtrek.data;
 
+import android.location.Address;
+
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -20,6 +22,7 @@ public class Attraction {
     private String startTime;
     private Date endDate;
     private String endTime;
+    private String address;
     private String coverImageURI;
 
     /**
@@ -49,6 +52,14 @@ public class Attraction {
 
     public void setCoverImageURI(String coverImageURI) {
         this.coverImageURI = coverImageURI;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 
     /**
@@ -121,6 +132,8 @@ public class Attraction {
     }
 
     public String getLocation() {
+        if (location == null)
+            location = "";
         return this.location;
     }
 
