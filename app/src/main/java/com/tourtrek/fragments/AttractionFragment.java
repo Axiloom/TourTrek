@@ -59,6 +59,7 @@ import com.tourtrek.activities.MainActivity;
 import com.tourtrek.adapters.CurrentPersonalToursAdapter;
 import com.tourtrek.data.Attraction;
 import com.tourtrek.notifications.AlarmBroadcastReceiver;
+import com.tourtrek.utilities.PlacesLocal;
 import com.tourtrek.viewModels.AttractionViewModel;
 import com.tourtrek.viewModels.TourViewModel;
 import com.tourtrek.data.Tour;
@@ -104,6 +105,7 @@ public class AttractionFragment extends Fragment {
     private TourViewModel tourViewModel;
     private AttractionViewModel attractionViewModel;
     private ImageView coverImageView;
+    private Button navigationAttractionButton;
 
     /**
      * Default for proper back button usage
@@ -146,6 +148,7 @@ public class AttractionFragment extends Fragment {
         coverTextView = attractionView.findViewById(R.id.attraction_cover_tv);
         updateAttractionButton = attractionView.findViewById(R.id.attraction_update_btn);
         deleteAttractionButton = attractionView.findViewById(R.id.attraction_delete_btn);
+        navigationAttractionButton = attractionView.findViewById(R.id.attraction_navigation_btn);
         buttonsContainer = attractionView.findViewById(R.id.attraction_buttons_container);
         searchAttractionButton = attractionView.findViewById(R.id.attraction_search_ib);
 
@@ -352,9 +355,10 @@ public class AttractionFragment extends Fragment {
 
         // set up the action to carry out via the update button
         setupUpdateAttractionButton(attractionView);
-
         // set up the action to carry out via the delete button
         setupDeleteAttractionButton(attractionView);
+
+        setupNavigationButton();
 
         return attractionView;
     }
@@ -398,9 +402,35 @@ public class AttractionFragment extends Fragment {
     }
 
     /**
+     * Setup of the onClickListener of the "Navigation" button
+     */
+    private void setupNavigationButton(){
+
+        navigationAttractionButton.setOnClickListener(v -> {
+
+            // check that location services are enabled and give a prompt to enable them if needed
+            Boolean permissionIsGranted = PlacesLocal.checkLocationPermission(getContext());
+            if (permissionIsGranted){
+                Log.d(TAG, "Location enabled");
+
+               // switch to the map fragment
+                final FragmentTransaction ft = getParentFragmentManager().beginTransaction();
+                ft.replace(R.id.nav_host_fragment, new MapsFragment(), "MapsFragment");
+                ft.addToBackStack("MapsFragment").commit();
+
+            }
+        });
+    }
+
+    /**
      * Check if the attraction belongs to the current user and make fields visible if so
      */
     public void attractionIsUsers() {
+
+        // navigation should be available for every attraction in the database
+        if (attractionViewModel.getSelectedAttraction().getAttractionUID() != null){
+            navigationAttractionButton.setVisibility((View.VISIBLE));
+        }
 
         // enables updating an attraction when it is part of a tour owned by the user and when it is a new attraction
         if (tourViewModel.isUserOwned() || attractionViewModel.isNewAttraction()){
