@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -16,6 +17,9 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.tourtrek.R;
+import com.tourtrek.activities.MainActivity;
+
+import static com.tourtrek.utilities.MapsUtilities.getUserLastLocation;
 
 public class MapsFragment extends Fragment {
     private static final String TAG = "MapsFragment";
@@ -33,9 +37,13 @@ public class MapsFragment extends Fragment {
          */
         @Override
         public void onMapReady(GoogleMap googleMap) {
-            LatLng sydney = new LatLng(-34, 151);
-            googleMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-            googleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+            // use a utility method to update the user's location
+            getUserLastLocation(new FusedLocationProviderClient(getContext()), getContext());
+            LatLng start = new LatLng(MainActivity.user.getGeoLocation().getLatitude(), MainActivity.user.getGeoLocation().getLongitude());
+
+            // mark the user's location on the map and move the camera to it
+            googleMap.addMarker(new MarkerOptions().position(start).title("Your Location"));
+            googleMap.moveCamera(CameraUpdateFactory.newLatLng(start));
         }
     };
 

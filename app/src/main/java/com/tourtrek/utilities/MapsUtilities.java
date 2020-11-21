@@ -35,7 +35,7 @@ public class MapsUtilities {
             if (task.isSuccessful()){
                 Location location = task.getResult();
                 MainActivity.user.setGeoLocation(new GeoPoint(location.getLatitude(), location.getLongitude()));
-                updateUser();
+                // updateUser();
             }
         });
     }
