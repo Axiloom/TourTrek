@@ -1,6 +1,7 @@
 package com.tourtrek.utilities;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.util.Log;
@@ -22,11 +23,11 @@ public class MapsUtilities {
      * @param locationClient
      * @return GeoPoint with coordinates for use by Maps
      */
-    public static void getUserLastLocation(FusedLocationProviderClient locationClient) {
+    public static void getUserLastLocation(FusedLocationProviderClient locationClient, Context context) {
 
         Log.d(TAG, "Updating user location.");
 
-        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(),
+        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(context,
                 Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
