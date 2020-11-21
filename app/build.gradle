@@ -108,8 +108,10 @@ dependencies {
     // Maps
     implementation 'com.google.android.gms:play-services-maps:17.0.0'
 
-    // Location for the Direactions API
+    // Direactions API
     implementation 'com.google.android.gms:play-services-location:17.0.0'
+    implementation 'com.google.maps:google-maps-services:0.15.0'
+    implementation 'org.slf4j:slf4j-simple:1.7.25'
 
 
 }

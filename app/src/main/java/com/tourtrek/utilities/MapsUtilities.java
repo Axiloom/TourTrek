@@ -18,26 +18,11 @@ import static com.tourtrek.utilities.Firestore.updateUser;
 public class MapsUtilities {
     private static String TAG = "MapsUtilities";
 
+
     /**
      * Use this method to update the current user's location
      * @param locationClient
      * @return GeoPoint with coordinates for use by Maps
      */
-    public static void getUserLastLocation(FusedLocationProviderClient locationClient, Context context) {
-
-        Log.d(TAG, "Updating user location.");
-
-        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(context,
-                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return;
-        }
-        locationClient.getLastLocation().addOnCompleteListener(task -> {
-            if (task.isSuccessful()){
-                Location location = task.getResult();
-                MainActivity.user.setGeoLocation(new GeoPoint(location.getLatitude(), location.getLongitude()));
-                // updateUser();
-            }
-        });
-    }
 
 }
