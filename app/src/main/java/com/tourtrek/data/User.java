@@ -1,6 +1,7 @@
 package com.tourtrek.data;
 
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.GeoPoint;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,6 +16,7 @@ public class User {
     private List<DocumentReference> contacts;
     private HashMap<String, Object> settings;
     private List<DocumentReference> friends;
+    private GeoPoint geoLocation;
 
     /**
      * Empty constructor needed for firestore
@@ -183,5 +185,13 @@ public class User {
         }
 
         this.friends.add(friendDocument);
+    }
+
+    public GeoPoint getGeoLocation() {
+        return geoLocation;
+    }
+
+    public void setGeoLocation(GeoPoint geoLocation) {
+        this.geoLocation = geoLocation;
     }
 }

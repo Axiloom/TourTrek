@@ -34,6 +34,8 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.libraries.places.api.Places;
@@ -106,6 +108,7 @@ public class AttractionFragment extends Fragment {
     private AttractionViewModel attractionViewModel;
     private ImageView coverImageView;
     private Button navigationAttractionButton;
+    private FusedLocationProviderClient locationClient;
 
     /**
      * Default for proper back button usage
@@ -125,7 +128,6 @@ public class AttractionFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
         // Grab a reference to the current view
         View attractionView = inflater.inflate(R.layout.fragment_attraction, container, false);
 
