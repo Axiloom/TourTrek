@@ -4,10 +4,13 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Looper;
@@ -29,12 +32,19 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.firestore.GeoPoint;
+import com.google.logging.type.HttpRequest;
 import com.tourtrek.R;
 import com.tourtrek.activities.MainActivity;
+import com.tourtrek.viewModels.AttractionViewModel;
+
+import java.io.IOException;
+import java.net.URI;
+import java.util.List;
+
 
 public class MapsFragment extends Fragment {
     private static final String TAG = "MapsFragment";
-
+    // AttractionViewModel attractionViewModel = new ViewModelProvider(requireActivity()).get(AttractionViewModel.class);
 
     private OnMapReadyCallback callback = new OnMapReadyCallback() {
 
@@ -50,10 +60,11 @@ public class MapsFragment extends Fragment {
          * https://stackoverflow.com/questions/29441384/fusedlocationapi-getlastlocation-always-null
          * and
          * https://www.youtube.com/watch?v=ZXXoIDj2pR0&list=PLgCYzUzKIBE-SZUrVOsbYMzH7tPigT3gi&index=6
+         *
          */
         @Override
         public void onMapReady(GoogleMap googleMap) {
-
+            // display the user's location, if available
             FusedLocationProviderClient locationProvider = LocationServices.getFusedLocationProviderClient(getContext());
 
             // set up the location request
@@ -86,14 +97,33 @@ public class MapsFragment extends Fragment {
                         LatLng start = new LatLng(location.getLatitude(), location.getLongitude());
                         googleMap.addMarker(new MarkerOptions().position(start).title("Starting Location"));
                         googleMap.moveCamera(CameraUpdateFactory.newLatLng(start));
+
                     }
                     else{
-                        Log.d(TAG, "NO PERSONAL LOCATION DATA FOUND");
-                        Toast.makeText(getActivity(), "NO PERSONAL LOCATION DATA FOUND", Toast.LENGTH_LONG).show();
+                        Log.d(TAG, "YOUR CURRENT LOCATION COULD NOT BE FOUND.");
+                        Toast.makeText(getActivity(), "Your current location could not be found.", Toast.LENGTH_SHORT).show();
                     }
-
                 });
             });
+
+            // coder to go back and forth between coordinates and human readable addresses
+            Geocoder coder = new Geocoder(getContext());
+            try {
+                // add the attraction to the map
+                Log.d(TAG, MainActivity.user.getCurrentAttraction().getLocation());
+                // use the coder to get a list of addresses from the current attraction's location field
+                List<Address> attractionAddresses = coder.getFromLocationName(MainActivity.user.getCurrentAttraction().getLocation(),1);
+                // pull out the coordinates of the location
+                LatLng destination = new LatLng(attractionAddresses.get(0).getLatitude(), attractionAddresses.get(0).getLongitude());
+                // add a marker for the attraction location
+                googleMap.addMarker(new MarkerOptions().position(destination).title("Destination"));
+                googleMap.moveCamera(CameraUpdateFactory.newLatLng(destination));
+
+                // explanation to the user
+                Toast.makeText(getActivity(), "Tap on a marker for navigation.", Toast.LENGTH_LONG).show();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         } // end onMapReady
     }; // end OnMapReadyCallback
 

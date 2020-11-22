@@ -91,6 +91,9 @@ import java.util.UUID;
  * It runs when a user selects the 'add attraction' option from within the fragment showing the list of attractions in a selected tour.
  * The fragment will consist of a form with text fields corresponding to Attraction variables to fill in and a button to collect
  * the contents of them and push the information to Firestore.
+ *
+ * TODO implement logic ensuring that the attraction location is a real place which can be found in Google Maps
+ * TODO make sure that this location is accessible via the view model
  */
 public class AttractionFragment extends Fragment {
 
@@ -184,7 +187,7 @@ public class AttractionFragment extends Fragment {
 
             // set up fields to be made visible since we are creating a new tour
             nameEditText.setEnabled(true);
-            locationEditText.setEnabled(true);
+//            locationEditText.setEnabled(true);
             costEditText.setEnabled(true);
             startDateButton.setEnabled(true);
             startTimeButton.setEnabled(true);
@@ -420,11 +423,15 @@ public class AttractionFragment extends Fragment {
             if (permissionIsGranted){
                 Log.d(TAG, "Location enabled");
 
+                // the attraction view model does not pass through to MapsFragment
+                if (MainActivity.user != null){
+                    MainActivity.user.setCurrentAttraction(attractionViewModel.getSelectedAttraction());
+                }
+
                // switch to the map fragment
                 final FragmentTransaction ft = getParentFragmentManager().beginTransaction();
                 ft.replace(R.id.nav_host_fragment, new MapsFragment(), "MapsFragment");
                 ft.addToBackStack("MapsFragment").commit();
-
             }
         });
     }
@@ -435,14 +442,14 @@ public class AttractionFragment extends Fragment {
     public void attractionIsUsers() {
 
         // navigation should be available for every attraction in the database
-        if (attractionViewModel.getSelectedAttraction().getAttractionUID() != null){
+        if (attractionViewModel.getSelectedAttraction().getAttractionUID() != null && MainActivity.user != null){
             navigationAttractionButton.setVisibility((View.VISIBLE));
         }
 
         // enables updating an attraction when it is part of a tour owned by the user and when it is a new attraction
         if (tourViewModel.isUserOwned() || attractionViewModel.isNewAttraction()){
             nameEditText.setEnabled(true);
-            locationEditText.setEnabled(true);
+//            locationEditText.setEnabled(true);
             costEditText.setEnabled(true);
             startDateButton.setEnabled(true);
             startTimeButton.setEnabled(true);
@@ -708,7 +715,13 @@ public class AttractionFragment extends Fragment {
 
                     })
                     .addOnFailureListener(e -> Log.w(TAG, "Error writing document"));
+
         });
+
+        // the attraction view model does not pass through to MapsFragment
+        if (MainActivity.user != null){
+            MainActivity.user.setCurrentAttraction(attractionViewModel.getSelectedAttraction());
+        }
     }
 
     /**
@@ -833,5 +846,10 @@ public class AttractionFragment extends Fragment {
                 .placeholder(R.drawable.default_image)
                 .into(coverImageView);
     }
+
+    public Attraction getAttraction(){
+        return (new ViewModelProvider(requireActivity()).get(AttractionViewModel.class)).getSelectedAttraction();
+    }
+
 
 }

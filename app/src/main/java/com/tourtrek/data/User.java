@@ -17,6 +17,7 @@ public class User {
     private HashMap<String, Object> settings;
     private List<DocumentReference> friends;
     private GeoPoint geoLocation;
+    private Attraction currentAttraction; // view models don't work with Maps
 
     /**
      * Empty constructor needed for firestore
@@ -193,5 +194,13 @@ public class User {
 
     public void setGeoLocation(GeoPoint geoLocation) {
         this.geoLocation = geoLocation;
+    }
+
+    public Attraction getCurrentAttraction() {
+        return currentAttraction;
+    }
+
+    public void setCurrentAttraction(Attraction currentAttraction) {
+        this.currentAttraction = currentAttraction;
     }
 }
