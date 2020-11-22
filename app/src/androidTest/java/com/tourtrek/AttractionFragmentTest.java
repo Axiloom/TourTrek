@@ -355,9 +355,6 @@ public class AttractionFragmentTest {
         onView(withId(R.id.attraction_update_btn)).perform(click());
     }
 
-    // TODO The navigation button should not appear for attractions on the add attraction screen
-    // TODO The navigation button should not appear in the attractions of public tours when you are logged out
-
     /**
      *
      */
@@ -369,7 +366,9 @@ public class AttractionFragmentTest {
         onView(withId(R.id.tour_delete_btn)).perform(click());
     }
 
-
+    // TODO - test for the attraction location marker
+    // TODO - test for either a starting location marker appearing or the toast saying that user location data could not be found
+    // TODO - test for the toast telling the user to tap on a marker
 
 
     /**
