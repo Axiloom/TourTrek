@@ -10,7 +10,8 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.location.Location;
+import android.location.Address;
+import android.location.Geocoder;
 import android.net.Uri;
 import android.os.Bundle;
 import androidx.activity.OnBackPressedCallback;
@@ -21,8 +22,8 @@ import androidx.core.app.NotificationCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelStoreOwner;
 
+import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -39,7 +40,16 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapView;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.libraries.places.api.Places;
@@ -51,39 +61,29 @@ import com.google.android.libraries.places.api.net.FetchPhotoResponse;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.libraries.places.widget.Autocomplete;
 import com.google.android.libraries.places.widget.AutocompleteActivity;
-import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
-import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
-import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.tourtrek.R;
 import com.tourtrek.activities.MainActivity;
-import com.tourtrek.adapters.CurrentPersonalToursAdapter;
 import com.tourtrek.data.Attraction;
 import com.tourtrek.notifications.AlarmBroadcastReceiver;
 import com.tourtrek.utilities.PlacesLocal;
 import com.tourtrek.viewModels.AttractionViewModel;
 import com.tourtrek.viewModels.TourViewModel;
-import com.tourtrek.data.Tour;
 
 import java.io.ByteArrayOutputStream;
-import java.text.DateFormat;
-import org.w3c.dom.Document;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import java.util.UUID;
 
 /**
@@ -95,10 +95,11 @@ import java.util.UUID;
  * TODO fix tapping the back button when in a Google Map leading to the add attraction screen
  * TODO make sure that this location is accessible via the view model
  */
-public class AttractionFragment extends Fragment {
+public class AttractionFragment extends Fragment implements OnMapReadyCallback {
 
     private static final String TAG = "AttractionFragment";
     private static final int AUTOCOMPLETE_REQUEST_CODE = 4588;
+    private static final String MAPVIEW_BUNDLE_KEY = "MapViewBundleKey";
     private EditText locationEditText;
     private EditText costEditText;
     private EditText nameEditText;
@@ -115,8 +116,9 @@ public class AttractionFragment extends Fragment {
     private TourViewModel tourViewModel;
     private AttractionViewModel attractionViewModel;
     private ImageView coverImageView;
-    private Button navigationAttractionButton;
     private FusedLocationProviderClient locationClient;
+    private MapView attractionMap;
+    private GoogleMap attractionGoogleMap;
 
     /**
      * Default for proper back button usage
@@ -145,6 +147,9 @@ public class AttractionFragment extends Fragment {
         // Initialize attractionMarketViewModel to get the current attraction
         attractionViewModel = new ViewModelProvider(requireActivity()).get(AttractionViewModel.class);
 
+        // Initialize the map
+        attractionMap = attractionView.findViewById(R.id.attraction_mapView);
+
         // Initialize all fields
         nameEditText = attractionView.findViewById(R.id.attraction_name_et);
         locationEditText = attractionView.findViewById(R.id.attraction_location_et);
@@ -158,7 +163,6 @@ public class AttractionFragment extends Fragment {
         coverTextView = attractionView.findViewById(R.id.attraction_cover_tv);
         updateAttractionButton = attractionView.findViewById(R.id.attraction_update_btn);
         deleteAttractionButton = attractionView.findViewById(R.id.attraction_delete_btn);
-        navigationAttractionButton = attractionView.findViewById(R.id.attraction_navigation_btn);
         buttonsContainer = attractionView.findViewById(R.id.attraction_buttons_container);
         searchAttractionButton = attractionView.findViewById(R.id.attraction_search_ib);
 
@@ -368,9 +372,36 @@ public class AttractionFragment extends Fragment {
         // set up the action to carry out via the delete button
         setupDeleteAttractionButton(attractionView);
 
-        setupNavigationButton();
+        initGoogleMap(savedInstanceState);
 
         return attractionView;
+    }
+
+    private void initGoogleMap(Bundle savedInstanceState){
+        // *** IMPORTANT ***
+        // MapView requires that the Bundle you pass contain _ONLY_ MapView SDK
+        // objects or sub-Bundles.
+        Bundle mapViewBundle = null;
+        if (savedInstanceState != null) {
+            mapViewBundle = savedInstanceState.getBundle(MAPVIEW_BUNDLE_KEY);
+        }
+
+        attractionMap.onCreate(mapViewBundle);
+
+        attractionMap.getMapAsync(this);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        Bundle mapViewBundle = outState.getBundle(MAPVIEW_BUNDLE_KEY);
+        if (mapViewBundle == null) {
+            mapViewBundle = new Bundle();
+            outState.putBundle(MAPVIEW_BUNDLE_KEY, mapViewBundle);
+        }
+
+        attractionMap.onSaveInstanceState(mapViewBundle);
     }
 
     @Override
@@ -399,6 +430,10 @@ public class AttractionFragment extends Fragment {
         else{
             ((MainActivity) requireActivity()).setActionBarTitle(attractionViewModel.getSelectedAttraction().getName());
         }
+
+        // necessary for the mapView
+        attractionMap.onResume();
+
     }
 
     @Override
@@ -412,40 +447,9 @@ public class AttractionFragment extends Fragment {
     }
 
     /**
-     * Setup of the onClickListener of the "Navigation" button
-     */
-    private void setupNavigationButton(){
-
-        navigationAttractionButton.setOnClickListener(v -> {
-
-            // check that location services are enabled and give a prompt to enable them if needed
-            Boolean permissionIsGranted = PlacesLocal.checkLocationPermission(getContext());
-            if (permissionIsGranted){
-                Log.d(TAG, "Location enabled");
-
-                // the attraction view model does not pass through to MapsFragment
-                if (MainActivity.user != null){
-                    MainActivity.user.setCurrentAttraction(attractionViewModel.getSelectedAttraction());
-                }
-
-               // switch to the map fragment
-                final FragmentTransaction ft = getParentFragmentManager().beginTransaction();
-                ft.replace(R.id.nav_host_fragment, new MapsFragment(), "MapsFragment");
-                ft.addToBackStack("MapsFragment").commit();
-            }
-        });
-    }
-
-    /**
      * Check if the attraction belongs to the current user and make fields visible if so
      */
     public void attractionIsUsers() {
-        Log.d(TAG, "Checking attraction status..." + "UID " + attractionViewModel.getSelectedAttraction().getAttractionUID() + "user " + MainActivity.user.getUsername());
-        // navigation should be available for every attraction in the database
-        if (attractionViewModel.getSelectedAttraction().getAttractionUID() != null && MainActivity.user != null){
-            navigationAttractionButton.setVisibility((View.VISIBLE));
-        }
-
         // enables updating an attraction when it is part of a tour owned by the user and when it is a new attraction
         if (tourViewModel.isUserOwned() || attractionViewModel.isNewAttraction()){
             nameEditText.setEnabled(true);
@@ -711,17 +715,17 @@ public class AttractionFragment extends Fragment {
                         }
                         else {
                             Toast.makeText(getContext(), "Successfully Updated Attraction", Toast.LENGTH_SHORT).show();
+                            getParentFragmentManager().popBackStack();
                         }
-
                     })
                     .addOnFailureListener(e -> Log.w(TAG, "Error writing document"));
-
         });
 
-        // the attraction view model does not pass through to MapsFragment
-        if (MainActivity.user != null){
-            MainActivity.user.setCurrentAttraction(attractionViewModel.getSelectedAttraction());
-        }
+//        // the attraction view model does not pass through to MapsFragment
+//        if (MainActivity.user != null){
+//            MainActivity.user.setCurrentAttraction(attractionViewModel.getSelectedAttraction());
+//        }
+
     }
 
     /**
@@ -845,6 +849,120 @@ public class AttractionFragment extends Fragment {
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .placeholder(R.drawable.default_image)
                 .into(coverImageView);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        attractionMap.onStart();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        attractionMap.onStop();
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+//        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)
+//                != PackageManager.PERMISSION_GRANTED
+//                && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION)
+//                != PackageManager.PERMISSION_GRANTED) {
+//            // TODO: Consider calling
+//            //    ActivityCompat#requestPermissions
+//            // here to request the missing permissions, and then overriding
+//            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+//            //                                          int[] grantResults)
+//            // to handle the case where the user grants the permission. See the documentation
+//            // for ActivityCompat#requestPermissions for more details.
+//            return;
+//        }
+//        map.setMyLocationEnabled(true);
+
+//        // set the GoogleMap for later resetting
+//        attractionGoogleMap = googleMap;
+
+        // display the user's location, if available
+        FusedLocationProviderClient locationProvider = LocationServices.getFusedLocationProviderClient(getContext());
+
+        // set up the location request
+        LocationRequest mLocationRequest = LocationRequest.create();
+
+        LocationCallback mLocationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                if (locationResult == null) {
+                    return;
+                }
+            }
+        };
+
+        // permission check
+        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(),
+                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+
+        // update the user's location
+        locationProvider.requestLocationUpdates(mLocationRequest, mLocationCallback, Looper.getMainLooper()).addOnCompleteListener(v -> {
+            // get the location
+            locationProvider.getLastLocation().addOnSuccessListener(location -> {
+                // console message
+                if (location != null){
+                    Log.d(TAG, "Latitude" + location.getLatitude() + ", " + "Longitude" + location.getLongitude());
+
+                    // add the current location to the map
+                    LatLng start = new LatLng(location.getLatitude(), location.getLongitude());
+                    googleMap.addMarker(new MarkerOptions().position(start).title("Starting Location"));
+                    googleMap.moveCamera(CameraUpdateFactory.newLatLng(start));
+
+                }
+                else{
+                    Log.d(TAG, "YOUR CURRENT LOCATION COULD NOT BE FOUND.");
+                    Toast.makeText(getActivity(), "Your current location could not be found.", Toast.LENGTH_SHORT).show();
+                }
+            });
+        });
+
+        // coder to go back and forth between coordinates and human readable addresses
+        Geocoder coder = new Geocoder(getContext());
+        try {
+            // add the attraction to the map
+//            Log.d(TAG, MainActivity.user.getCurrentAttraction().getLocation());
+            Log.d(TAG, attractionViewModel.getSelectedAttraction().getLocation());
+            // use the coder to get a list of addresses from the current attraction's location field
+//            List<Address> attractionAddresses = coder.getFromLocationName(MainActivity.user.getCurrentAttraction().getLocation(),1);
+            List<Address> attractionAddresses = coder.getFromLocationName(attractionViewModel.getSelectedAttraction().getLocation(),1);
+            // pull out the coordinates of the location
+            LatLng destination = new LatLng(attractionAddresses.get(0).getLatitude(), attractionAddresses.get(0).getLongitude());
+            // add a marker for the attraction location
+            googleMap.addMarker(new MarkerOptions().position(destination).title("Destination"));
+            googleMap.moveCamera(CameraUpdateFactory.newLatLng(destination));
+
+            // explanation to the user
+            Toast.makeText(getActivity(), "Tap on a marker for navigation.", Toast.LENGTH_LONG).show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onPause() {
+        attractionMap.onPause();
+        super.onPause();
+    }
+
+    @Override
+    public void onDestroy() {
+        attractionMap.onDestroy();
+        super.onDestroy();
+    }
+
+    @Override
+    public void onLowMemory() {
+        super.onLowMemory();
+        attractionMap.onLowMemory();
     }
 
 }

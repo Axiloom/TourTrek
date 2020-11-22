@@ -41,7 +41,6 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.tourtrek.R;
 import com.tourtrek.data.User;
-import com.tourtrek.fragments.MapsFragment;
 import com.tourtrek.fragments.ProfileFragment;
 import com.tourtrek.utilities.Firestore;
 import com.tourtrek.utilities.PlacesLocal;
