@@ -5,6 +5,7 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.widget.SearchView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
+import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -17,7 +18,10 @@ import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.location.Address;
+import android.location.Geocoder;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -29,11 +33,13 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
@@ -49,6 +55,17 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapView;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -70,6 +87,9 @@ import com.tourtrek.utilities.AttractionLocationSorter;
 import com.tourtrek.utilities.AttractionNameSorter;
 import com.tourtrek.viewModels.TourViewModel;
 
+import org.w3c.dom.Document;
+
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -80,7 +100,8 @@ import java.util.List;
 import java.util.UUID;
 import static com.tourtrek.utilities.Firestore.updateUser;
 
-public class TourFragment extends Fragment implements AdapterView.OnItemSelectedListener {
+// TODO - map scrolling https://stackoverflow.com/questions/14025859/scrollview-is-catching-touch-event-for-google-map
+public class TourFragment extends Fragment implements AdapterView.OnItemSelectedListener, OnMapReadyCallback {
 
     private static final String TAG = "TourFragment";
     private TourViewModel tourViewModel;
@@ -100,7 +121,7 @@ public class TourFragment extends Fragment implements AdapterView.OnItemSelected
     private CheckBox publicCheckBox;
     private RelativeLayout checkBoxesContainer;
     private LinearLayout buttonsContainer;
-    Button shareButton;
+    private Button shareButton;
     private ImageView coverImageView;
     private Button attractionSortButton;
     private AlertDialog dialog;
@@ -109,6 +130,9 @@ public class TourFragment extends Fragment implements AdapterView.OnItemSelected
             "Name Descending", "Location Descending", "Cost Descending"};
     private String result = "";
     private boolean added;
+    private MapView tourMap;
+    private static final String MAPVIEW_BUNDLE_KEY = "MapViewBundleKey";
+//    private NestedScrollView scrollView;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -141,8 +165,31 @@ public class TourFragment extends Fragment implements AdapterView.OnItemSelected
         // Initialize tourViewModel to get the current tour
         tourViewModel = new ViewModelProvider(requireActivity()).get(TourViewModel.class);
 
-        //initialize attractionSortButton
+        // Initialize attractionSortButton
         attractionSortButton = tourView.findViewById(R.id.tour_attraction_sort_btn);
+
+        // Initialize the map
+        tourMap = tourView.findViewById(R.id.tour_mapView);
+        if (tourViewModel.isNewTour() || tourViewModel.getSelectedTour().getAttractions().size() == 0){
+            tourMap.setVisibility(View.GONE);
+        }
+//        scrollView = tourView.findViewById(R.id.tour_nestedScrollView);
+//        tourMap.setOnTouchListener(new View.OnTouchListener() {
+//            @Override
+//            public boolean onTouch(View v, MotionEvent event) {
+//                switch (event.getAction()) {
+//                    case MotionEvent.ACTION_MOVE:
+//                        scrollView.requestDisallowInterceptTouchEvent(true);
+//                        break;
+//                    case MotionEvent.ACTION_UP:
+//                    case MotionEvent.ACTION_CANCEL:
+//                        scrollView.requestDisallowInterceptTouchEvent(false);
+//                        break;
+//                }
+//                return tourMap.onTouchEvent(event);
+//            }
+//        });
+
 
         //Setup dialog;
         builder = new AlertDialog.Builder(requireActivity());
@@ -347,7 +394,36 @@ public class TourFragment extends Fragment implements AdapterView.OnItemSelected
 
         setupDeleteTourButton(tourView);
 
+        initGoogleMap(savedInstanceState);
+
         return tourView;
+    }
+
+    private void initGoogleMap(Bundle savedInstanceState){
+        // *** IMPORTANT ***
+        // MapView requires that the Bundle you pass contain _ONLY_ MapView SDK
+        // objects or sub-Bundles.
+        Bundle mapViewBundle = null;
+        if (savedInstanceState != null) {
+            mapViewBundle = savedInstanceState.getBundle(MAPVIEW_BUNDLE_KEY);
+        }
+
+        tourMap.onCreate(mapViewBundle);
+
+        tourMap.getMapAsync(this);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        Bundle mapViewBundle = outState.getBundle(MAPVIEW_BUNDLE_KEY);
+        if (mapViewBundle == null) {
+            mapViewBundle = new Bundle();
+            outState.putBundle(MAPVIEW_BUNDLE_KEY, mapViewBundle);
+        }
+
+        tourMap.onSaveInstanceState(mapViewBundle);
     }
 
     @Override
@@ -457,6 +533,8 @@ public class TourFragment extends Fragment implements AdapterView.OnItemSelected
         else
             ((MainActivity) requireActivity()).setActionBarTitle(tourViewModel.getSelectedTour().getName());
 
+        // necessary for the mapView
+        tourMap.onResume();
     }
 
     /**
@@ -879,7 +957,6 @@ public class TourFragment extends Fragment implements AdapterView.OnItemSelected
 
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
-
     }
 
 
@@ -969,5 +1046,135 @@ public class TourFragment extends Fragment implements AdapterView.OnItemSelected
         alarmMgr.setExact(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), alarmIntent);
 
     }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+//        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)
+//                != PackageManager.PERMISSION_GRANTED
+//                && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION)
+//                != PackageManager.PERMISSION_GRANTED) {
+//            // TODO: Consider calling
+//            //    ActivityCompat#requestPermissions
+//            // here to request the missing permissions, and then overriding
+//            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+//            //                                          int[] grantResults)
+//            // to handle the case where the user grants the permission. See the documentation
+//            // for ActivityCompat#requestPermissions for more details.
+//            return;
+//        }
+//        map.setMyLocationEnabled(true);
+
+//        // set the GoogleMap for later resetting
+//        attractionGoogleMap = googleMap;
+
+        // display the user's location, if available
+        FusedLocationProviderClient locationProvider = LocationServices.getFusedLocationProviderClient(getContext());
+
+        // set up the location request
+        LocationRequest mLocationRequest = LocationRequest.create();
+
+        LocationCallback mLocationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                if (locationResult == null) {
+                    return;
+                }
+            }
+        };
+
+        // permission check
+        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(),
+                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+
+        // update the user's location
+        locationProvider.requestLocationUpdates(mLocationRequest, mLocationCallback, Looper.getMainLooper()).addOnCompleteListener(v -> {
+            // get the location
+            locationProvider.getLastLocation().addOnSuccessListener(location -> {
+                // console message
+                if (location != null){
+                    Log.d(TAG, "Latitude" + location.getLatitude() + ", " + "Longitude" + location.getLongitude());
+
+                    // add the current location to the map
+                    LatLng start = new LatLng(location.getLatitude(), location.getLongitude());
+                    googleMap.addMarker(new MarkerOptions().position(start).title("Starting Location"));
+                    googleMap.moveCamera(CameraUpdateFactory.newLatLng(start));
+
+                }
+                else{
+                    Log.d(TAG, "YOUR CURRENT LOCATION COULD NOT BE FOUND.");
+                    Toast.makeText(getActivity(), "Your current location could not be found.", Toast.LENGTH_SHORT).show();
+                }
+            });
+        });
+
+        // coder to go back and forth between coordinates and human readable addresses
+        Geocoder coder = new Geocoder(getContext());
+        // get the list of attraction documents and the size so that the last one can be zoomed in on
+        List<DocumentReference> attractionRefs = tourViewModel.getSelectedTour().getAttractions();
+        int size = attractionRefs.size();
+        // add a marker for each attraction in the tour
+        for (int i = 0; i < size; i++){
+            DocumentReference attractionRef = attractionRefs.get(i);
+            attractionRef.get().addOnCompleteListener(task -> {
+                // parse the reference into an Attraction object
+                Attraction attraction = task.getResult().toObject(Attraction.class);
+                // log for debugging
+                Log.d(TAG, attraction.getLocation());
+                try {
+                    // use the coder to get a list of addresses from the current attraction's location field
+                    List<Address> attractionAddresses = coder.getFromLocationName(attraction.getLocation(),1);
+                    // pull out the coordinates of the location
+                    if (attractionAddresses.size() > 0){
+                        LatLng destination = new LatLng(attractionAddresses.get(0).getLatitude(), attractionAddresses.get(0).getLongitude());
+                        // add a marker for the attraction location
+                        googleMap.addMarker(new MarkerOptions().position(destination).title(attraction.getName()));
+                        // zoom onto the last marker
+                        if (attractionRef == attractionRefs.get(size-1)){
+                            googleMap.moveCamera(CameraUpdateFactory.newLatLng(destination));
+                        }
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
+        }
+        // explanation to the user
+        if (size != 0){
+            Toast.makeText(getActivity(), "Tap on a marker for navigation.", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        tourMap.onStart();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        tourMap.onStop();
+    }
+
+    @Override
+    public void onPause() {
+        tourMap.onPause();
+        super.onPause();
+    }
+
+    @Override
+    public void onDestroy() {
+        tourMap.onDestroy();
+        super.onDestroy();
+    }
+
+    @Override
+    public void onLowMemory() {
+        super.onLowMemory();
+        tourMap.onLowMemory();
+    }
+
 }
 

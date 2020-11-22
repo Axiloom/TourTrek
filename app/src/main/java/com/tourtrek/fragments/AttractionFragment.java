@@ -92,8 +92,6 @@ import java.util.UUID;
  * The fragment will consist of a form with text fields corresponding to Attraction variables to fill in and a button to collect
  * the contents of them and push the information to Firestore.
  *
- * TODO fix tapping the back button when in a Google Map leading to the add attraction screen
- * TODO make sure that this location is accessible via the view model
  */
 public class AttractionFragment extends Fragment implements OnMapReadyCallback {
 
@@ -118,7 +116,6 @@ public class AttractionFragment extends Fragment implements OnMapReadyCallback {
     private ImageView coverImageView;
     private FusedLocationProviderClient locationClient;
     private MapView attractionMap;
-    private GoogleMap attractionGoogleMap;
 
     /**
      * Default for proper back button usage
