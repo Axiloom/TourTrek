@@ -279,7 +279,7 @@
             <com.google.android.gms.maps.MapView
                 android:id="@+id/tour_mapView"
                 android:layout_width="match_parent"
-                android:layout_height="296dp"
+                android:layout_height="377dp"
                 android:paddingTop="10dp" />
 
             <RelativeLayout
