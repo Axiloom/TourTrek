@@ -280,8 +280,9 @@ public class TourFragmentTest {
         onView(withId(R.id.tour_update_btn)).perform(click());
     }
 
-
-
+    // TODO check for the navigation toast message when a tour map is displayed
+    // TODO check for the no location found toast message when a tour map is displayed and the user has no personal location data
+    // TODO check for my navigation markers
 
     /**
      * For dates and times
