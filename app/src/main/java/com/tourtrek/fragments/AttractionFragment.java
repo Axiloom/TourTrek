@@ -92,7 +92,7 @@ import java.util.UUID;
  * The fragment will consist of a form with text fields corresponding to Attraction variables to fill in and a button to collect
  * the contents of them and push the information to Firestore.
  *
- * TODO implement logic ensuring that the attraction location is a real place which can be found in Google Maps
+ * TODO fix tapping the back button when in a Google Map leading to the add attraction screen
  * TODO make sure that this location is accessible via the view model
  */
 public class AttractionFragment extends Fragment {
@@ -440,7 +440,7 @@ public class AttractionFragment extends Fragment {
      * Check if the attraction belongs to the current user and make fields visible if so
      */
     public void attractionIsUsers() {
-
+        Log.d(TAG, "Checking attraction status..." + "UID " + attractionViewModel.getSelectedAttraction().getAttractionUID() + "user " + MainActivity.user.getUsername());
         // navigation should be available for every attraction in the database
         if (attractionViewModel.getSelectedAttraction().getAttractionUID() != null && MainActivity.user != null){
             navigationAttractionButton.setVisibility((View.VISIBLE));
@@ -846,10 +846,5 @@ public class AttractionFragment extends Fragment {
                 .placeholder(R.drawable.default_image)
                 .into(coverImageView);
     }
-
-    public Attraction getAttraction(){
-        return (new ViewModelProvider(requireActivity()).get(AttractionViewModel.class)).getSelectedAttraction();
-    }
-
 
 }

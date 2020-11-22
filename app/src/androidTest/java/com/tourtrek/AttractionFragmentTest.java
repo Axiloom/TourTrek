@@ -355,6 +355,9 @@ public class AttractionFragmentTest {
         onView(withId(R.id.attraction_update_btn)).perform(click());
     }
 
+    // TODO The navigation button should not appear for attractions on the add attraction screen
+    // TODO The navigation button should not appear in the attractions of public tours when you are logged out
+
     /**
      *
      */
