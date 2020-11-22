@@ -149,6 +149,9 @@ public class AttractionFragment extends Fragment implements OnMapReadyCallback {
 
         // Initialize the map
         attractionMap = attractionView.findViewById(R.id.attraction_mapView);
+        if (attractionViewModel.getSelectedAttraction() == null){
+            attractionMap.setVisibility(View.GONE);
+        }
 
         // Initialize all fields
         nameEditText = attractionView.findViewById(R.id.attraction_name_et);
