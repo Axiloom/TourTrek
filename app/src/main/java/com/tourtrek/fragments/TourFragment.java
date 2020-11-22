@@ -99,6 +99,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import static com.tourtrek.utilities.Firestore.updateUser;
+import static com.tourtrek.utilities.PlacesLocal.checkLocationPermission;
 
 // TODO - map scrolling https://stackoverflow.com/questions/14025859/scrollview-is-catching-touch-event-for-google-map
 public class TourFragment extends Fragment implements AdapterView.OnItemSelectedListener, OnMapReadyCallback {
@@ -1067,6 +1068,9 @@ public class TourFragment extends Fragment implements AdapterView.OnItemSelected
 //        // set the GoogleMap for later resetting
 //        attractionGoogleMap = googleMap;
 
+        // location permissions
+        checkLocationPermission(getContext());
+
         // display the user's location, if available
         FusedLocationProviderClient locationProvider = LocationServices.getFusedLocationProviderClient(getContext());
 
@@ -1083,10 +1087,10 @@ public class TourFragment extends Fragment implements AdapterView.OnItemSelected
         };
 
         // permission check
-        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(),
-                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return;
-        }
+//        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(),
+//                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+//            return;
+//        }
 
         // update the user's location
         locationProvider.requestLocationUpdates(mLocationRequest, mLocationCallback, Looper.getMainLooper()).addOnCompleteListener(v -> {

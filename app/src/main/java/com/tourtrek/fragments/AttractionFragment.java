@@ -86,6 +86,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import static com.tourtrek.utilities.PlacesLocal.checkLocationPermission;
+
 /**
  * This fragment corresponds to the user story for creating a custom attraction.
  * It runs when a user selects the 'add attraction' option from within the fragment showing the list of attractions in a selected tour.
@@ -883,6 +885,9 @@ public class AttractionFragment extends Fragment implements OnMapReadyCallback {
 //        // set the GoogleMap for later resetting
 //        attractionGoogleMap = googleMap;
 
+        // location permissions
+        checkLocationPermission(getContext());
+
         // display the user's location, if available
         FusedLocationProviderClient locationProvider = LocationServices.getFusedLocationProviderClient(getContext());
 
@@ -899,10 +904,10 @@ public class AttractionFragment extends Fragment implements OnMapReadyCallback {
         };
 
         // permission check
-        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(),
-                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return;
-        }
+//        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(),
+//                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+//            return;
+//        }
 
         // update the user's location
         locationProvider.requestLocationUpdates(mLocationRequest, mLocationCallback, Looper.getMainLooper()).addOnCompleteListener(v -> {

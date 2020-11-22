@@ -106,7 +106,7 @@ public class PlacesLocal {
             if (ActivityCompat.shouldShowRequestPermissionRationale((Activity) context, Manifest.permission.ACCESS_FINE_LOCATION)) {
                 new AlertDialog.Builder(context)
                         .setTitle("Requesting Location Permission")
-                        .setMessage("Requesting Location Permission Text")
+                        .setMessage("Requesting Location Permission Text...")
                         .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
