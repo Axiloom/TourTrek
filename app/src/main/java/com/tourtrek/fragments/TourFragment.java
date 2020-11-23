@@ -66,6 +66,7 @@ import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -107,7 +108,7 @@ public class TourFragment extends Fragment implements AdapterView.OnItemSelected
     private static final String TAG = "TourFragment";
     private TourViewModel tourViewModel;
     private AttractionViewModel attractionViewModel;
-    private RecyclerView.Adapter attractionsAdapter;
+    private CurrentTourAttractionsAdapter attractionsAdapter;
     private SwipeRefreshLayout swipeRefreshLayout;
     private Button addAttractionButton;
     private EditText locationEditText;
@@ -550,43 +551,29 @@ public class TourFragment extends Fragment implements AdapterView.OnItemSelected
         // Setup collection reference
         CollectionReference attractionsCollection = db.collection("Attractions");
 
-        // Pull out the UID's of each tour that belongs to this user
-        List<String> usersAttractionUIDs = new ArrayList<>();
+        // Grab each attraction for the selected tour
         if (!tourViewModel.getSelectedTour().getAttractions().isEmpty()) {
+
+            // Clear the data set if one exists
+            if (attractionsAdapter != null)
+                attractionsAdapter.clear();
+
             for (DocumentReference documentReference : tourViewModel.getSelectedTour().getAttractions()) {
-                usersAttractionUIDs.add(documentReference.getId());
+
+                attractionsCollection.document(documentReference.getId()).get()
+                        .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                            @Override
+                            public void onSuccess(DocumentSnapshot documentSnapshot) {
+
+                                attractionsAdapter.addNewData(documentSnapshot.toObject(Attraction.class));
+                                attractionsAdapter.copyAttractions(attractionsAdapter.getDataSet());
+                                swipeRefreshLayout.setRefreshing(false);
+
+                            }
+                        });
+
             }
         }
-
-        // Query database
-        attractionsCollection
-                .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-
-                    if (queryDocumentSnapshots.isEmpty()) {
-                        Log.w(TAG, "No documents found in the Attractions collection for this user");
-                    }
-                    else {
-
-                        // Final list of tours for this category
-                        List<Attraction> usersAttractions = new ArrayList<>();
-
-                        // Go through each document and compare the dates
-                        for (DocumentSnapshot document : queryDocumentSnapshots.getDocuments()) {
-
-                            // First check that the document belongs to the user
-                            if (usersAttractionUIDs.contains(document.getId())) {
-                                usersAttractions.add(document.toObject(Attraction.class));
-                            }
-                        }
-
-                        ((CurrentTourAttractionsAdapter) attractionsAdapter).clear();
-                        ((CurrentTourAttractionsAdapter) attractionsAdapter).addAll(usersAttractions);
-                        ((CurrentTourAttractionsAdapter) attractionsAdapter).copyAttractions(usersAttractions);
-                        swipeRefreshLayout.setRefreshing(false);
-
-                    }
-                });
     }
 
     /**

@@ -148,28 +148,28 @@ public class TourFragmentTest {
     }
 
 
-    /**
-     * Test deletion of a tour
-     */
-    @Test
-    public void deletionTest() throws InterruptedException {
-        tourConditionsTest("deletion");
-
-        onView(isRoot()).perform(waitForView(R.id.personal_past_tours_rv, TimeUnit.SECONDS.toMillis(100)));
-
-        sleep(1000); // give time for the recycler view items to load
-
-        // find the newly made attraction and select it
-        onView(withId(R.id.personal_past_tours_rv)).perform(RecyclerViewActions.actionOnItemAtPosition(0,click()));
-        onView(isRoot()).perform(waitForView(R.id.tour_name_et, TimeUnit.SECONDS.toMillis(1000)));
-        onView(withId(R.id.tour_delete_btn)).perform(nestedScrollTo());
-        onView(withId(R.id.tour_delete_btn)).perform(click());
-
-
-        sleep(1000);
-        // check for the proper toast message
-        onView(withText("Tour removed")).inRoot(new ToastMatcher()).check(matches(isDisplayed()));
-    }
+//    /**
+//     * Test deletion of a tour
+//     */
+//    @Test
+//    public void deletionTest() throws InterruptedException {
+//        tourConditionsTest("deletion");
+//
+//        onView(isRoot()).perform(waitForView(R.id.personal_past_tours_rv, TimeUnit.SECONDS.toMillis(100)));
+//
+//        sleep(1000); // give time for the recycler view items to load
+//
+//        // find the newly made attraction and select it
+//        onView(withId(R.id.personal_past_tours_rv)).perform(RecyclerViewActions.actionOnItemAtPosition(0,click()));
+//        onView(isRoot()).perform(waitForView(R.id.tour_name_et, TimeUnit.SECONDS.toMillis(1000)));
+//        onView(withId(R.id.tour_delete_btn)).perform(nestedScrollTo());
+//        onView(withId(R.id.tour_delete_btn)).perform(click());
+//
+//
+//        sleep(1000);
+//        // check for the proper toast message
+//        onView(withText("Tour removed")).inRoot(new ToastMatcher()).check(matches(isDisplayed()));
+//    }
 
     /**
      * Test deletion of a tour

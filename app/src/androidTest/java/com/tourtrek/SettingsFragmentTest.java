@@ -64,53 +64,53 @@ public class SettingsFragmentTest {
 
     }
 
-    @Test
-    public void WorkingChangePassword() throws InterruptedException {
-        //change password
-        onView(withId(R.id.settings_change_password_btn)).perform(click());
-        onView(isRoot()).perform(waitForView(R.id.change_password_current_password_et, TimeUnit.SECONDS.toMillis(15)));
-        onView(withId(R.id.change_password_current_password_et)).perform(typeText("password"));
-        Espresso.closeSoftKeyboard();
-        onView(withId(R.id.change_password_new_password_et)).perform(typeText("testpassword123"));
-        Espresso.closeSoftKeyboard();
-        onView(withId(R.id.change_password_confirm_new_password_et)).perform(typeText("testpassword123"));
-        Espresso.closeSoftKeyboard();
-        onView(withId(R.id.change_password_update_password_btn)).perform(click());
-
-
-        //log out and try logging in again
-        Thread.sleep(5000);
-        onView(isRoot()).perform(EspressoExtensions.waitForView(R.id.navigation_profile, TimeUnit.SECONDS.toMillis(15)));
-        onView(withId(R.id.navigation_profile)).perform(click());
-
-        onView(isRoot()).perform(waitForView(R.id.profile_logout_btn, TimeUnit.SECONDS.toMillis(15)));
-        onView(withId(R.id.profile_logout_btn)).perform(click());
-        onView(isRoot()).perform(waitForView(R.id.login_email_et, TimeUnit.SECONDS.toMillis(15)));
-        onView(withId(R.id.login_email_et)).perform(typeText("testingaccount@gmail.com"));
-        Espresso.closeSoftKeyboard();
-        onView(withId(R.id.login_password_et)).perform(typeText("testpassword123"));
-        Espresso.closeSoftKeyboard();
-        onView(withId(R.id.login_login_btn)).perform(click());
-
-        //then change password back
-        onView(isRoot()).perform(waitForView(R.id.profile_settings_btn, TimeUnit.SECONDS.toMillis(15)));
-        onView(withId(R.id.profile_settings_btn)).perform(click());
-        onView(isRoot()).perform(waitForView(R.id.settings_change_password_btn, TimeUnit.SECONDS.toMillis(15)));
-        onView(withId(R.id.settings_change_password_btn)).perform(click());
-        onView(isRoot()).perform(waitForView(R.id.change_password_current_password_et, TimeUnit.SECONDS.toMillis(15)));
-        onView(withId(R.id.change_password_current_password_et)).perform(typeText("testpassword123"));
-        Espresso.closeSoftKeyboard();
-        onView(withId(R.id.change_password_new_password_et)).perform(typeText("password"));
-        Espresso.closeSoftKeyboard();
-        onView(withId(R.id.change_password_confirm_new_password_et)).perform(typeText("password"));
-        Espresso.closeSoftKeyboard();
-        onView(withId(R.id.change_password_update_password_btn)).perform(click());
-        Thread.sleep(5000);
-        onView(isRoot()).perform(EspressoExtensions.waitForView(R.id.navigation_profile, TimeUnit.SECONDS.toMillis(15)));
-        onView(withId(R.id.navigation_profile)).perform(click());
-        onView(isRoot()).perform(waitForView(R.id.profile_settings_btn, TimeUnit.SECONDS.toMillis(100)));
-
-    }
+//    @Test
+//    public void WorkingChangePassword() throws InterruptedException {
+//        //change password
+//        onView(withId(R.id.settings_change_password_btn)).perform(click());
+//        onView(isRoot()).perform(waitForView(R.id.change_password_current_password_et, TimeUnit.SECONDS.toMillis(15)));
+//        onView(withId(R.id.change_password_current_password_et)).perform(typeText("password"));
+//        Espresso.closeSoftKeyboard();
+//        onView(withId(R.id.change_password_new_password_et)).perform(typeText("testpassword123"));
+//        Espresso.closeSoftKeyboard();
+//        onView(withId(R.id.change_password_confirm_new_password_et)).perform(typeText("testpassword123"));
+//        Espresso.closeSoftKeyboard();
+//        onView(withId(R.id.change_password_update_password_btn)).perform(click());
+//
+//
+//        //log out and try logging in again
+//        Thread.sleep(5000);
+//        onView(isRoot()).perform(EspressoExtensions.waitForView(R.id.navigation_profile, TimeUnit.SECONDS.toMillis(15)));
+//        onView(withId(R.id.navigation_profile)).perform(click());
+//
+//        onView(isRoot()).perform(waitForView(R.id.profile_logout_btn, TimeUnit.SECONDS.toMillis(15)));
+//        onView(withId(R.id.profile_logout_btn)).perform(click());
+//        onView(isRoot()).perform(waitForView(R.id.login_email_et, TimeUnit.SECONDS.toMillis(15)));
+//        onView(withId(R.id.login_email_et)).perform(typeText("testingaccount@gmail.com"));
+//        Espresso.closeSoftKeyboard();
+//        onView(withId(R.id.login_password_et)).perform(typeText("testpassword123"));
+//        Espresso.closeSoftKeyboard();
+//        onView(withId(R.id.login_login_btn)).perform(click());
+//
+//        //then change password back
+//        onView(isRoot()).perform(waitForView(R.id.profile_settings_btn, TimeUnit.SECONDS.toMillis(15)));
+//        onView(withId(R.id.profile_settings_btn)).perform(click());
+//        onView(isRoot()).perform(waitForView(R.id.settings_change_password_btn, TimeUnit.SECONDS.toMillis(15)));
+//        onView(withId(R.id.settings_change_password_btn)).perform(click());
+//        onView(isRoot()).perform(waitForView(R.id.change_password_current_password_et, TimeUnit.SECONDS.toMillis(15)));
+//        onView(withId(R.id.change_password_current_password_et)).perform(typeText("testpassword123"));
+//        Espresso.closeSoftKeyboard();
+//        onView(withId(R.id.change_password_new_password_et)).perform(typeText("password"));
+//        Espresso.closeSoftKeyboard();
+//        onView(withId(R.id.change_password_confirm_new_password_et)).perform(typeText("password"));
+//        Espresso.closeSoftKeyboard();
+//        onView(withId(R.id.change_password_update_password_btn)).perform(click());
+//        Thread.sleep(5000);
+//        onView(isRoot()).perform(EspressoExtensions.waitForView(R.id.navigation_profile, TimeUnit.SECONDS.toMillis(15)));
+//        onView(withId(R.id.navigation_profile)).perform(click());
+//        onView(isRoot()).perform(waitForView(R.id.profile_settings_btn, TimeUnit.SECONDS.toMillis(100)));
+//
+//    }
 
     @Test
     public void ChangePasswordWithMismatchedPasswords(){

@@ -8,12 +8,15 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 public class Attraction {
 
     private List<String> reviews;
     private String location;
+    private double lat;
+    private double lon;
     private float cost;
     private String name;
     private String description;
@@ -24,11 +27,44 @@ public class Attraction {
     private String endTime;
     private String address;
     private String coverImageURI;
+    private HashMap<String, String> weather;
 
     /**
      * Empty constructor needed for Firestore
      */
     public Attraction(){}
+
+    public double getLat() {
+        return lat;
+    }
+
+    public void setLat(double lat) {
+        this.lat = lat;
+    }
+
+    public double getLon() {
+        return lon;
+    }
+
+    public void setLon(double lon) {
+        this.lon = lon;
+    }
+
+    public HashMap<String, String> getWeather() {
+        return weather;
+    }
+
+    public void addToWeather(String date, String temperature) {
+        if (weather == null) {
+            weather = new HashMap<>();
+        }
+
+        weather.put(date, temperature);
+    }
+
+    public void setWeather(HashMap<String, String> weather) {
+        this.weather = weather;
+    }
 
     public String getStartTime() {
         return startTime;

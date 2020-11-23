@@ -92,14 +92,14 @@ public class FriendFragmentTest {
         onView(withId(R.id.add_friend_error_tv)).check(matches(withText("Friend already exists")));
     }
 
-//     @Test
-//     public void addFriendSuccessfullyFeedback() throws InterruptedException {
-
-//         onView(withId(R.id.add_friend_email_et)).perform((typeText("Robert@gmail.com")), ViewActions.closeSoftKeyboard());
-//         onView(withId(R.id.add_friend_search_btn)).perform(click());
-//         onView(isRoot()).perform(waitForView(R.id.add_friend_add_btn, TimeUnit.SECONDS.toMillis(15), TimeUnit.SECONDS.toMillis(10)));
-//         onView(withId(R.id.add_friend_add_btn)).perform(click());
-//         onView(withText(R.string.Add_Friend_Success_TOAST_STRING)).inRoot(new ToastMatcher())
-//                 .check(matches(isDisplayed()));
-//     }
+//    @Test
+//    public void addFriendSuccessfullyFeedback() throws InterruptedException {
+//
+//        onView(withId(R.id.add_friend_email_et)).perform((typeText("Robert@gmail.com")), ViewActions.closeSoftKeyboard());
+//        onView(withId(R.id.add_friend_search_btn)).perform(click());
+//        onView(isRoot()).perform(waitForView(R.id.add_friend_add_btn, TimeUnit.SECONDS.toMillis(15), TimeUnit.SECONDS.toMillis(10)));
+//        onView(withId(R.id.add_friend_add_btn)).perform(click());
+//        onView(withText(R.string.Add_Friend_Success_TOAST_STRING)).inRoot(new ToastMatcher())
+//                .check(matches(isDisplayed()));
+//    }
 }

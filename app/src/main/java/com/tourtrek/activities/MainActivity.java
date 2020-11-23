@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
@@ -44,6 +45,7 @@ import com.tourtrek.data.User;
 import com.tourtrek.fragments.ProfileFragment;
 import com.tourtrek.utilities.Firestore;
 import com.tourtrek.utilities.PlacesLocal;
+import com.tourtrek.utilities.Weather;
 import com.tourtrek.viewModels.AttractionViewModel;
 
 import androidx.annotation.NonNull;
@@ -60,8 +62,12 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import java.io.ByteArrayOutputStream;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -192,7 +198,64 @@ public class MainActivity extends AppCompatActivity {
                 String date = (month + 1) + "/" + day + "/" + year;
                 button.setText(date);
                 button.setBackgroundColor(Color.parseColor("#10000000"));
+            }
+        };
 
+        final Calendar calendar = Calendar.getInstance();
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH);
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+
+        DatePickerDialog datePickerDialog = new DatePickerDialog(this, dateSetListener, year, month, day);
+
+        datePickerDialog.show();
+    }
+
+    public void showDatePickerDialog(Button button, TextView weather, Context context) {
+
+        final DatePickerDialog.OnDateSetListener dateSetListener = new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker datePicker, int year, int month, int day) {
+
+                String date = (month + 1) + "/" + day + "/" + year;
+                button.setText(date);
+                button.setBackgroundColor(Color.parseColor("#10000000"));
+
+                AttractionViewModel attractionViewModel = new ViewModelProvider((MainActivity)context).get(AttractionViewModel.class);
+
+                // Wait for the weather api to receive the data
+                if (attractionViewModel.getSelectedAttraction().getWeather() != null) {
+
+                    for (Map.Entry<String, String> entry : attractionViewModel.getSelectedAttraction().getWeather().entrySet()) {
+                        String aDateString = entry.getKey();
+
+                        java.text.DateFormat formatter = new SimpleDateFormat("E MMM dd HH:mm:ss z yyyy");
+
+                        Calendar calendar = Calendar.getInstance();
+
+                        try {
+                            Date aDate = formatter.parse(aDateString);
+                            calendar.setTime(aDate);
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                            Log.e(TAG, "Error converting string date");
+                        }
+
+                        String temperature = entry.getValue();
+
+                        int aMonth = calendar.get(Calendar.MONTH);
+                        int aDay = calendar.get(Calendar.DAY_OF_MONTH);
+                        int aYear = calendar.get(Calendar.YEAR);
+
+                        if (aMonth == month && aDay == day && aYear == year) {
+                            weather.setText(String.format("%s℉", temperature));
+                            break;
+                        }
+                        else
+                            weather.setText("N/A");
+
+                    }
+                }
             }
         };
 
