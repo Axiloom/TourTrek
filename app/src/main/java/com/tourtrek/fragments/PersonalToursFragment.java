@@ -329,17 +329,17 @@ public class PersonalToursFragment extends Fragment {
                                 Timestamp now = Timestamp.now();
 
                                 // the start date is before now and the end date is after now
-                                if (type.equals("current") && tourStartDate.compareTo(now) < 0 && tourEndDate.compareTo(now) > 0) {
+                                if (type.equals("current") && tourStartDate != null && tourStartDate.compareTo(now) < 0 && tourEndDate != null && tourEndDate.compareTo(now) > 0) {
                                     currentTourAdapter.addNewData(documentSnapshot.toObject(Tour.class));
                                     currentSwipeRefreshLayout.setRefreshing(false);
                                 }
                                 // the start date is after now and the end date is after now
-                                else if (type.equals("future") && tourStartDate.compareTo(now) > 0 && tourEndDate.compareTo(now) > 0) {
+                                else if (type.equals("future") && tourStartDate != null && tourStartDate.compareTo(now) > 0 && tourEndDate != null && tourEndDate.compareTo(now) > 0) {
                                     ((FuturePersonalToursAdapter) futureTourAdapter).addNewData(documentSnapshot.toObject(Tour.class));
                                     futureSwipeRefreshLayout.setRefreshing(false);
                                 }
                                 // the start date and end dates are before now
-                                else if (type.equals("past") && tourStartDate.compareTo(now) < 0 && tourEndDate.compareTo(now) < 0) {
+                                else if (type.equals("past") && tourStartDate != null && tourStartDate.compareTo(now) < 0 && tourEndDate != null && tourEndDate.compareTo(now) < 0) {
                                     ((PastPersonalToursAdapter) pastTourAdapter).addNewData(documentSnapshot.toObject(Tour.class));
                                     pastSwipeRefreshLayout.setRefreshing(false);
                                 }

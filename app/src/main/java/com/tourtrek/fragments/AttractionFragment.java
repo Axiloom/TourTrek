@@ -10,8 +10,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.location.Address;
-import android.location.Geocoder;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import androidx.activity.OnBackPressedCallback;
@@ -24,7 +23,6 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelStoreOwner;
 
-import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -41,16 +39,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationCallback;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapView;
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.libraries.places.api.Places;
@@ -68,6 +57,7 @@ import com.google.android.libraries.places.widget.model.AutocompleteActivityMode
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -76,17 +66,15 @@ import com.tourtrek.activities.MainActivity;
 import com.tourtrek.adapters.CurrentPersonalToursAdapter;
 import com.tourtrek.data.Attraction;
 import com.tourtrek.notifications.AlarmBroadcastReceiver;
-import com.tourtrek.utilities.Weather;
+import com.tourtrek.utilities.PlacesLocal;
 import com.tourtrek.viewModels.AttractionViewModel;
 import com.tourtrek.viewModels.TourViewModel;
 import com.tourtrek.data.Tour;
-import com.tourtrek.utilities.PlacesLocal;
 
 import java.io.ByteArrayOutputStream;
 import java.text.DateFormat;
 import org.w3c.dom.Document;
 
-import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -96,29 +84,26 @@ import java.util.Date;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
-
-import static com.tourtrek.utilities.PlacesLocal.checkLocationPermission;
 
 /**
  * This fragment corresponds to the user story for creating a custom attraction.
  * It runs when a user selects the 'add attraction' option from within the fragment showing the list of attractions in a selected tour.
  * The fragment will consist of a form with text fields corresponding to Attraction variables to fill in and a button to collect
  * the contents of them and push the information to Firestore.
+ *
+ * TODO fix tapping the back button when in a Google Map leading to the add attraction screen
+ * TODO make sure that this location is accessible via the view model
  */
-public class AttractionFragment extends Fragment implements OnMapReadyCallback {
+public class AttractionFragment extends Fragment {
 
     private static final String TAG = "AttractionFragment";
     private static final int AUTOCOMPLETE_REQUEST_CODE = 4588;
-    private static final String MAPVIEW_BUNDLE_KEY = "MapViewBundleKey";
     private EditText locationEditText;
     private EditText costEditText;
     private EditText nameEditText;
     private EditText descriptionEditText;
     private TextView coverTextView;
-    private TextView weatherTextView;
     private Button startDateButton;
     private Button startTimeButton;
     private Button endDateButton;
@@ -130,8 +115,8 @@ public class AttractionFragment extends Fragment implements OnMapReadyCallback {
     private TourViewModel tourViewModel;
     private AttractionViewModel attractionViewModel;
     private ImageView coverImageView;
+    private Button navigationAttractionButton;
     private FusedLocationProviderClient locationClient;
-    private MapView attractionMap;
 
     /**
      * Default for proper back button usage
@@ -151,7 +136,6 @@ public class AttractionFragment extends Fragment implements OnMapReadyCallback {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
         // Grab a reference to the current view
         View attractionView = inflater.inflate(R.layout.fragment_attraction, container, false);
 
@@ -160,12 +144,6 @@ public class AttractionFragment extends Fragment implements OnMapReadyCallback {
 
         // Initialize attractionMarketViewModel to get the current attraction
         attractionViewModel = new ViewModelProvider(requireActivity()).get(AttractionViewModel.class);
-
-        // Initialize the map
-        attractionMap = attractionView.findViewById(R.id.attraction_mapView);
-        if (attractionViewModel.getSelectedAttraction() == null){
-            attractionMap.setVisibility(View.GONE);
-        }
 
         // Initialize all fields
         nameEditText = attractionView.findViewById(R.id.attraction_name_et);
@@ -180,9 +158,9 @@ public class AttractionFragment extends Fragment implements OnMapReadyCallback {
         coverTextView = attractionView.findViewById(R.id.attraction_cover_tv);
         updateAttractionButton = attractionView.findViewById(R.id.attraction_update_btn);
         deleteAttractionButton = attractionView.findViewById(R.id.attraction_delete_btn);
+        navigationAttractionButton = attractionView.findViewById(R.id.attraction_navigation_btn);
         buttonsContainer = attractionView.findViewById(R.id.attraction_buttons_container);
         searchAttractionButton = attractionView.findViewById(R.id.attraction_search_ib);
-        weatherTextView = attractionView.findViewById(R.id.attraction_weather_tv);
 
         searchAttractionButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -242,56 +220,6 @@ public class AttractionFragment extends Fragment implements OnMapReadyCallback {
             descriptionEditText.setText(attractionViewModel.getSelectedAttraction().getDescription());
             updateAttractionButton.setText("Update Attraction");
 
-            if (attractionViewModel.getSelectedAttraction().getLon() != 0 && attractionViewModel.getSelectedAttraction().getLat() != 0) {
-
-                // Get updated weather
-                Weather.getWeather(attractionViewModel.getSelectedAttraction().getLat(), attractionViewModel.getSelectedAttraction().getLon(), getContext());
-
-                // get temperature
-                // Wait for the weather api to receive the data
-                if (attractionViewModel.getSelectedAttraction().getWeather() != null && attractionViewModel.getSelectedAttraction().getStartDate() != null) {
-
-                    for (Map.Entry<String, String> entry : attractionViewModel.getSelectedAttraction().getWeather().entrySet()) {
-                        String aDateString = entry.getKey();
-
-                        java.text.DateFormat formatter = new SimpleDateFormat("E MMM dd HH:mm:ss z yyyy");
-
-                        Calendar calendar = Calendar.getInstance();
-
-                        try {
-                            Date aDate = formatter.parse(aDateString);
-                            calendar.setTime(aDate);
-                        } catch (ParseException e) {
-                            e.printStackTrace();
-                            Log.e(TAG, "Error converting string date");
-                        }
-
-                        String temperature = entry.getValue();
-
-                        int aMonth = calendar.get(Calendar.MONTH);
-                        int aDay = calendar.get(Calendar.DAY_OF_MONTH);
-                        int aYear = calendar.get(Calendar.YEAR);
-
-                        Calendar newCalendar = Calendar.getInstance();
-
-                        newCalendar.setTime(attractionViewModel.getSelectedAttraction().getStartDate());
-
-                        int startMonth = newCalendar.get(Calendar.MONTH);
-                        int startDay = newCalendar.get(Calendar.DAY_OF_MONTH);
-                        int startYear = newCalendar.get(Calendar.YEAR);
-
-                        if (aMonth == startMonth && aDay == startDay && aYear == startYear) {
-                            weatherTextView.setText(String.format("%s ℉", temperature));
-                            break;
-                        }
-                        else
-                            weatherTextView.setText("N/A");
-
-                    }
-                }
-
-            }
-
             Glide.with(getContext())
                     .load(attractionViewModel.getSelectedAttraction().getCoverImageURI())
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
@@ -347,18 +275,7 @@ public class AttractionFragment extends Fragment implements OnMapReadyCallback {
             }
         });
 
-        startDateButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                // Get the most recent weather data
-                if (attractionViewModel.getSelectedAttraction().getLat() != 0 && attractionViewModel.getSelectedAttraction().getLon() != 0) {
-                    Weather.getWeather(attractionViewModel.getSelectedAttraction().getLat(), attractionViewModel.getSelectedAttraction().getLon(), getContext());
-                }
-
-                ((MainActivity) requireActivity()).showDatePickerDialog(startDateButton, weatherTextView, getContext());
-            }
-        });
+        startDateButton.setOnClickListener(view -> ((MainActivity) requireActivity()).showDatePickerDialog(startDateButton));
 
         startDateButton.setOnFocusChangeListener((view, hasFocus) -> {
 
@@ -451,36 +368,9 @@ public class AttractionFragment extends Fragment implements OnMapReadyCallback {
         // set up the action to carry out via the delete button
         setupDeleteAttractionButton(attractionView);
 
-        initGoogleMap(savedInstanceState);
+        setupNavigationButton();
 
         return attractionView;
-    }
-
-    private void initGoogleMap(Bundle savedInstanceState){
-        // *** IMPORTANT ***
-        // MapView requires that the Bundle you pass contain _ONLY_ MapView SDK
-        // objects or sub-Bundles.
-        Bundle mapViewBundle = null;
-        if (savedInstanceState != null) {
-            mapViewBundle = savedInstanceState.getBundle(MAPVIEW_BUNDLE_KEY);
-        }
-
-        attractionMap.onCreate(mapViewBundle);
-
-        attractionMap.getMapAsync(this);
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-
-        Bundle mapViewBundle = outState.getBundle(MAPVIEW_BUNDLE_KEY);
-        if (mapViewBundle == null) {
-            mapViewBundle = new Bundle();
-            outState.putBundle(MAPVIEW_BUNDLE_KEY, mapViewBundle);
-        }
-
-        attractionMap.onSaveInstanceState(mapViewBundle);
     }
 
     @Override
@@ -509,26 +399,54 @@ public class AttractionFragment extends Fragment implements OnMapReadyCallback {
         else{
             ((MainActivity) requireActivity()).setActionBarTitle(attractionViewModel.getSelectedAttraction().getName());
         }
-
-        // necessary for the mapView
-        attractionMap.onResume();
-
     }
 
     @Override
     public void onDestroyView() {
 
         tourViewModel.setReturnedFromAddAttraction(false);
-        attractionViewModel.setIsNewAttraction(null);
-        attractionViewModel.setSelectedAttraction(null);
+
+        if (!attractionViewModel.returnedFromNavigation()) {
+            attractionViewModel.setIsNewAttraction(null);
+            attractionViewModel.setSelectedAttraction(null);
+        }
+
+        attractionViewModel.setReturnedFromNavigation(false);
 
         super.onDestroyView();
+    }
+
+    /**
+     * Setup of the onClickListener of the "Navigation" button
+     */
+    private void setupNavigationButton(){
+
+        navigationAttractionButton.setOnClickListener(v -> {
+
+            // check that location services are enabled and give a prompt to enable them if needed
+//            Boolean permissionIsGranted = PlacesLocal.checkLocationPermission(getContext());
+//            if (permissionIsGranted){
+//                Log.d(TAG, "Location enabled");
+
+                attractionViewModel.setReturnedFromNavigation(true);
+
+                // switch to the map fragment
+                final FragmentTransaction ft = getParentFragmentManager().beginTransaction();
+                ft.replace(R.id.nav_host_fragment, new MapsFragment(), "MapsFragment");
+                ft.addToBackStack("MapsFragment").commit();
+//            }
+        });
     }
 
     /**
      * Check if the attraction belongs to the current user and make fields visible if so
      */
     public void attractionIsUsers() {
+//        Log.d(TAG, "Checking attraction status..." + "UID " + attractionViewModel.getSelectedAttraction().getAttractionUID() + "user " + MainActivity.user.getUsername());
+        // navigation should be available for every attraction in the database
+        if (attractionViewModel.getSelectedAttraction().getAttractionUID() != null){
+            navigationAttractionButton.setVisibility((View.VISIBLE));
+        }
 
         // enables updating an attraction when it is part of a tour owned by the user and when it is a new attraction
         if (tourViewModel.isUserOwned() || attractionViewModel.isNewAttraction()){
@@ -570,137 +488,76 @@ public class AttractionFragment extends Fragment implements OnMapReadyCallback {
             if (resultCode == Activity.RESULT_OK) {
                 Place place = Autocomplete.getPlaceFromIntent(data);
 
-                attractionViewModel.getSelectedAttraction().setCoverImageURI("");
-                weatherTextView.setText("N/A");
+                PhotoMetadata photoMetadata = place.getPhotoMetadatas().get(0);
+                String attributes = photoMetadata.getAttributions();
 
-                if (place.getPhotoMetadatas() != null) {
-                    PhotoMetadata photoMetadata = place.getPhotoMetadatas().get(0);
-                    String attributes = photoMetadata.getAttributions();
+                FetchPhotoRequest photoRequest = FetchPhotoRequest.builder(photoMetadata).build();
 
-                    FetchPhotoRequest photoRequest = FetchPhotoRequest.builder(photoMetadata).build();
+                PlacesClient placesClient = Places.createClient(requireContext());
 
-                    PlacesClient placesClient = Places.createClient(requireContext());
+                LinearLayout loadingContainer = getActivity().findViewById(R.id.attraction_cover_loading_container);
+                loadingContainer.setVisibility(View.VISIBLE);
 
-                    LinearLayout loadingContainer = getActivity().findViewById(R.id.attraction_cover_loading_container);
-                    loadingContainer.setVisibility(View.VISIBLE);
+                placesClient.fetchPhoto(photoRequest)
+                        .addOnSuccessListener(new OnSuccessListener<FetchPhotoResponse>() {
+                            @Override
+                            public void onSuccess(FetchPhotoResponse fetchPhotoResponse) {
+                                Bitmap bitmap = fetchPhotoResponse.getBitmap();
 
-                    placesClient.fetchPhoto(photoRequest)
-                            .addOnSuccessListener(new OnSuccessListener<FetchPhotoResponse>() {
-                                @Override
-                                public void onSuccess(FetchPhotoResponse fetchPhotoResponse) {
-                                    Bitmap bitmap = fetchPhotoResponse.getBitmap();
+                                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+                                byte[] data = baos.toByteArray();
 
-                                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-                                    byte[] data = baos.toByteArray();
+                                // Load image into view
+                                Glide.with(requireContext())
+                                        .load(data)
+                                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                                        .placeholder(R.drawable.default_image)
+                                        .into(coverImageView);
 
-                                    // Load image into view
-                                    Glide.with(requireContext())
-                                            .load(data)
-                                            .diskCacheStrategy(DiskCacheStrategy.ALL)
-                                            .placeholder(R.drawable.default_image)
-                                            .into(coverImageView);
+                                loadingContainer.setVisibility(View.GONE);
 
-                                    loadingContainer.setVisibility(View.GONE);
+                                // Upload Image to firestore storage
+                                final FirebaseStorage storage = FirebaseStorage.getInstance();
 
-                                    // Upload Image to firestore storage
-                                    final FirebaseStorage storage = FirebaseStorage.getInstance();
+                                final UUID imageUUID = UUID.randomUUID();
 
-                                    final UUID imageUUID = UUID.randomUUID();
+                                final StorageReference storageReference = storage.getReference().child("AttractionCoverPictures/" + imageUUID);
 
-                                    final StorageReference storageReference = storage.getReference().child("AttractionCoverPictures/" + imageUUID);
+                                final UploadTask uploadTask = storageReference.putBytes(data);
 
-                                    final UploadTask uploadTask = storageReference.putBytes(data);
+                                uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                    @Override
+                                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
 
-                                    uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                                        @Override
-                                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                        storage.getReference().child("AttractionCoverPictures/" + imageUUID).getDownloadUrl()
+                                                .addOnSuccessListener(uri -> {
+                                                    attractionViewModel.getSelectedAttraction().setCoverImageURI(uri.toString());
 
-                                            storage.getReference().child("AttractionCoverPictures/" + imageUUID).getDownloadUrl()
-                                                    .addOnSuccessListener(uri -> {
-                                                        attractionViewModel.getSelectedAttraction().setCoverImageURI(uri.toString());
+                                                    Log.i(TAG, "Successfully loaded cover image");
 
-                                                        Log.i(TAG, "Successfully loaded cover image");
-
-                                                    });
-                                        }
-                                    })
-                                            .addOnFailureListener(new OnFailureListener() {
-                                                @Override
-                                                public void onFailure(@NonNull Exception e) {
-                                                    System.out.println("FAILING");
-                                                }
-                                            });
-                                }
-                            })
-                            .addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
-                                    System.out.println("FAILING");
-                                }
-                            });
-                }
-                else {
-
-                    // Load image into view
-                    Glide.with(requireContext())
-                            .load(R.drawable.default_image)
-                            .diskCacheStrategy(DiskCacheStrategy.ALL)
-                            .into(coverImageView);
-                }
+                                                });
+                                    }
+                                })
+                                        .addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+                                                System.out.println("FAILING");
+                                            }
+                                        });
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                System.out.println("FAILING");
+                            }
+                        });
 
                 attractionViewModel.setReturnedFromSearch(true);
 
                 attractionViewModel.getSelectedAttraction().setName(place.getName());
                 attractionViewModel.getSelectedAttraction().setLocation(place.getAddress());
-                attractionViewModel.getSelectedAttraction().setLat(Objects.requireNonNull(place.getLatLng()).latitude);
-                attractionViewModel.getSelectedAttraction().setLon(Objects.requireNonNull(place.getLatLng()).longitude);
-
-                // Get updated weather
-                Weather.getWeather(attractionViewModel.getSelectedAttraction().getLat(), attractionViewModel.getSelectedAttraction().getLon(), getContext());
-
-                // get temperature
-                // Wait for the weather api to receive the data
-                if (attractionViewModel.getSelectedAttraction().getWeather() != null && attractionViewModel.getSelectedAttraction().getStartDate() != null) {
-
-                    for (Map.Entry<String, String> entry : attractionViewModel.getSelectedAttraction().getWeather().entrySet()) {
-                        String aDateString = entry.getKey();
-
-                        java.text.DateFormat formatter = new SimpleDateFormat("E MMM dd HH:mm:ss z yyyy");
-
-                        Calendar calendar = Calendar.getInstance();
-
-                        try {
-                            Date aDate = formatter.parse(aDateString);
-                            calendar.setTime(aDate);
-                        } catch (ParseException e) {
-                            e.printStackTrace();
-                            Log.e(TAG, "Error converting string date");
-                        }
-
-                        String temperature = entry.getValue();
-
-                        int aMonth = calendar.get(Calendar.MONTH);
-                        int aDay = calendar.get(Calendar.DAY_OF_MONTH);
-                        int aYear = calendar.get(Calendar.YEAR);
-
-                        Calendar newCalendar = Calendar.getInstance();
-
-                        newCalendar.setTime(attractionViewModel.getSelectedAttraction().getStartDate());
-
-                        int startMonth = newCalendar.get(Calendar.MONTH);
-                        int startDay = newCalendar.get(Calendar.DAY_OF_MONTH);
-                        int startYear = newCalendar.get(Calendar.YEAR);
-
-                        if (aMonth == startMonth && aDay == startDay && aYear == startYear) {
-                            weatherTextView.setText(String.format("%s ℉", temperature));
-                            break;
-                        }
-                        else
-                            weatherTextView.setText("N/A");
-
-                    }
-                }
 
             }
             else if (resultCode == AutocompleteActivity.RESULT_ERROR) {
@@ -841,9 +698,9 @@ public class AttractionFragment extends Fragment implements OnMapReadyCallback {
                     .document(attractionViewModel.getSelectedAttraction().getAttractionUID())
                     .set(attractionViewModel.getSelectedAttraction())
                     .addOnCompleteListener(task -> {
-                        Log.d(TAG, "Attraction written to firestore with UID: " + attractionViewModel.getSelectedAttraction().getAttractionUID());
+                        Log.d(TAG, "Attraction written to firestore");
 
-                        // Add/Update attraction to the selected tour
+                        // update the attraction to the tour object in the firestore
                         db.collection("Tours").document(tourViewModel.getSelectedTour().getTourUID()).update("attractions", tourViewModel.getSelectedTour().getAttractions());
 
                         // TODO: Setup alarm for start time
@@ -856,16 +713,12 @@ public class AttractionFragment extends Fragment implements OnMapReadyCallback {
                         }
                         else {
                             Toast.makeText(getContext(), "Successfully Updated Attraction", Toast.LENGTH_SHORT).show();
-                            getParentFragmentManager().popBackStack();
                         }
+
                     })
                     .addOnFailureListener(e -> Log.w(TAG, "Error writing document"));
-        });
 
-//        // the attraction view model does not pass through to MapsFragment
-//        if (MainActivity.user != null){
-//            MainActivity.user.setCurrentAttraction(attractionViewModel.getSelectedAttraction());
-//        }
+        });
 
     }
 
@@ -922,12 +775,12 @@ public class AttractionFragment extends Fragment implements OnMapReadyCallback {
      * Precondition: not a new tour
      */
     private void updateTourWithDeletion(FirebaseFirestore db){
-                db.collection("Tours").document(tourViewModel.getSelectedTour().getTourUID())
-                        .set(tourViewModel.getSelectedTour())
-                        .addOnSuccessListener(aVoid -> {
-                            Log.d(TAG, "Tour written to Firestore");
-                        })
-                        .addOnFailureListener(e -> Log.w(TAG, "Error writing tour document"));
+        db.collection("Tours").document(tourViewModel.getSelectedTour().getTourUID())
+                .set(tourViewModel.getSelectedTour())
+                .addOnSuccessListener(aVoid -> {
+                    Log.d(TAG, "Tour written to Firestore");
+                })
+                .addOnFailureListener(e -> Log.w(TAG, "Error writing tour document"));
     }
     private void scheduleNotification() {
 
@@ -978,7 +831,7 @@ public class AttractionFragment extends Fragment implements OnMapReadyCallback {
         Intent intent = new Autocomplete.IntentBuilder(
                 AutocompleteActivityMode.FULLSCREEN,
                 Arrays.asList(Place.Field.NAME, Place.Field.ADDRESS, Place.Field.ADDRESS_COMPONENTS,
-                        Place.Field.PHOTO_METADATAS, Place.Field.LAT_LNG))
+                        Place.Field.PHOTO_METADATAS))
                 .setTypeFilter(TypeFilter.ESTABLISHMENT)
                 .build(requireContext());
         startActivityForResult(intent, AUTOCOMPLETE_REQUEST_CODE);
@@ -990,123 +843,6 @@ public class AttractionFragment extends Fragment implements OnMapReadyCallback {
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .placeholder(R.drawable.default_image)
                 .into(coverImageView);
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        attractionMap.onStart();
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        attractionMap.onStop();
-    }
-
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-//        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)
-//                != PackageManager.PERMISSION_GRANTED
-//                && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION)
-//                != PackageManager.PERMISSION_GRANTED) {
-//            // TODO: Consider calling
-//            //    ActivityCompat#requestPermissions
-//            // here to request the missing permissions, and then overriding
-//            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-//            //                                          int[] grantResults)
-//            // to handle the case where the user grants the permission. See the documentation
-//            // for ActivityCompat#requestPermissions for more details.
-//            return;
-//        }
-//        map.setMyLocationEnabled(true);
-
-//        // set the GoogleMap for later resetting
-//        attractionGoogleMap = googleMap;
-
-        // location permissions
-        checkLocationPermission(getContext());
-
-        // display the user's location, if available
-        FusedLocationProviderClient locationProvider = LocationServices.getFusedLocationProviderClient(getContext());
-
-        // set up the location request
-        LocationRequest mLocationRequest = LocationRequest.create();
-
-        LocationCallback mLocationCallback = new LocationCallback() {
-            @Override
-            public void onLocationResult(LocationResult locationResult) {
-                if (locationResult == null) {
-                    return;
-                }
-            }
-        };
-
-        // permission check
-//        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(),
-//                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-//            return;
-//        }
-
-        // update the user's location
-        locationProvider.requestLocationUpdates(mLocationRequest, mLocationCallback, Looper.getMainLooper()).addOnCompleteListener(v -> {
-            // get the location
-            locationProvider.getLastLocation().addOnSuccessListener(location -> {
-                // console message
-                if (location != null){
-                    Log.d(TAG, "Latitude" + location.getLatitude() + ", " + "Longitude" + location.getLongitude());
-
-                    // add the current location to the map
-                    LatLng start = new LatLng(location.getLatitude(), location.getLongitude());
-                    googleMap.addMarker(new MarkerOptions().position(start).title("Starting Location"));
-                    googleMap.moveCamera(CameraUpdateFactory.newLatLng(start));
-
-                }
-                else{
-                    Log.d(TAG, "YOUR CURRENT LOCATION COULD NOT BE FOUND.");
-                    Toast.makeText(getActivity(), "Your current location could not be found.", Toast.LENGTH_SHORT).show();
-                }
-            });
-        });
-
-        // coder to go back and forth between coordinates and human readable addresses
-        Geocoder coder = new Geocoder(getContext());
-        try {
-            // add the attraction to the map
-//            Log.d(TAG, MainActivity.user.getCurrentAttraction().getLocation());
-            Log.d(TAG, attractionViewModel.getSelectedAttraction().getLocation());
-            // use the coder to get a list of addresses from the current attraction's location field
-//            List<Address> attractionAddresses = coder.getFromLocationName(MainActivity.user.getCurrentAttraction().getLocation(),1);
-            List<Address> attractionAddresses = coder.getFromLocationName(attractionViewModel.getSelectedAttraction().getLocation(),1);
-            // pull out the coordinates of the location
-            LatLng destination = new LatLng(attractionAddresses.get(0).getLatitude(), attractionAddresses.get(0).getLongitude());
-            // add a marker for the attraction location
-            googleMap.addMarker(new MarkerOptions().position(destination).title("Destination"));
-            googleMap.moveCamera(CameraUpdateFactory.newLatLng(destination));
-
-            // explanation to the user
-            Toast.makeText(getActivity(), "Tap on a marker for navigation.", Toast.LENGTH_LONG).show();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    public void onPause() {
-        attractionMap.onPause();
-        super.onPause();
-    }
-
-    @Override
-    public void onDestroy() {
-        attractionMap.onDestroy();
-        super.onDestroy();
-    }
-
-    @Override
-    public void onLowMemory() {
-        super.onLowMemory();
-        attractionMap.onLowMemory();
     }
 
 }

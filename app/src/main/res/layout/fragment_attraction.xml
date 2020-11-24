@@ -342,11 +342,6 @@
                     android:textColorHighlight="#AAAAAAAA"
                     android:textSize="20dp" />
 
-                <com.google.android.gms.maps.MapView
-                    android:id="@+id/attraction_mapView"
-                    android:layout_width="match_parent"
-                    android:layout_height="438dp" />
-
                 <LinearLayout
                     android:id="@+id/attraction_buttons_container"
                     android:layout_width="match_parent"
@@ -391,6 +386,23 @@
                         android:visibility="gone" />
 
                 </LinearLayout>
+
+                <Button
+                    android:id="@+id/attraction_navigation_btn"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginEnd="12dp"
+                    android:layout_marginStart="24dp"
+                    android:layout_weight="0.4"
+                    android:background="@color/colorPrimaryDark"
+                    android:enabled="true"
+                    android:text="Navigation"
+                    android:textAllCaps="false"
+                    android:textColor="#FFFFFF"
+                    android:textSize="15dp"
+                    android:textStyle="bold"
+                    android:visibility="gone" />
             </LinearLayout>
 
         </LinearLayout>
