@@ -11,6 +11,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.location.Location;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import androidx.activity.OnBackPressedCallback;
@@ -23,6 +24,7 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelStoreOwner;
 
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -36,7 +38,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -117,6 +123,8 @@ public class AttractionFragment extends Fragment {
     private ImageView coverImageView;
     private Button navigationAttractionButton;
     private FusedLocationProviderClient locationClient;
+    // To keep track of whether we are in an async call
+    private boolean loading;
 
     /**
      * Default for proper back button usage
@@ -128,7 +136,8 @@ public class AttractionFragment extends Fragment {
         OnBackPressedCallback callback = new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
-                getParentFragmentManager().popBackStack();
+                if (!loading)
+                    getParentFragmentManager().popBackStack();
             }
         };
         requireActivity().getOnBackPressedDispatcher().addCallback(this, callback);
@@ -220,8 +229,81 @@ public class AttractionFragment extends Fragment {
             descriptionEditText.setText(attractionViewModel.getSelectedAttraction().getDescription());
             updateAttractionButton.setText("Update Attraction");
 
+            if (attractionViewModel.getSelectedAttraction().getLon() != 0 && attractionViewModel.getSelectedAttraction().getLat() != 0) {
+
+                // Get updated weather
+                Weather.getWeather(attractionViewModel.getSelectedAttraction().getLat(), attractionViewModel.getSelectedAttraction().getLon(), getContext());
+
+                // get temperature
+                // Wait for the weather api to receive the data
+                if (attractionViewModel.getSelectedAttraction().getWeather() != null && attractionViewModel.getSelectedAttraction().getStartDate() != null) {
+
+                    for (Map.Entry<String, String> entry : attractionViewModel.getSelectedAttraction().getWeather().entrySet()) {
+                        String aDateString = entry.getKey();
+
+                        java.text.DateFormat formatter = new SimpleDateFormat("E MMM dd HH:mm:ss z yyyy");
+
+                        Calendar calendar = Calendar.getInstance();
+
+                        try {
+                            Date aDate = formatter.parse(aDateString);
+                            calendar.setTime(aDate);
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                            Log.e(TAG, "Error converting string date");
+                        }
+
+                        String temperature = entry.getValue();
+
+                        int aMonth = calendar.get(Calendar.MONTH);
+                        int aDay = calendar.get(Calendar.DAY_OF_MONTH);
+                        int aYear = calendar.get(Calendar.YEAR);
+
+                        Calendar newCalendar = Calendar.getInstance();
+
+                        newCalendar.setTime(attractionViewModel.getSelectedAttraction().getStartDate());
+
+                        int startMonth = newCalendar.get(Calendar.MONTH);
+                        int startDay = newCalendar.get(Calendar.DAY_OF_MONTH);
+                        int startYear = newCalendar.get(Calendar.YEAR);
+
+                        if (aMonth == startMonth && aDay == startDay && aYear == startYear) {
+                            weatherTextView.setText(String.format("%s ℉", temperature));
+                            break;
+                        }
+                        else
+                            weatherTextView.setText("N/A");
+
+                    }
+                }
+
+            }
+
+            LinearLayout loadingContainer = attractionView.findViewById(R.id.attraction_cover_loading_container);
+            loadingContainer.setVisibility(View.VISIBLE);
+            ((MainActivity)requireActivity()).disableTabs();
+            loading = true;
             Glide.with(getContext())
                     .load(attractionViewModel.getSelectedAttraction().getCoverImageURI())
+                    .listener(new RequestListener<Drawable>() {
+                        @Override
+                        public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                            LinearLayout loadingContainer = attractionView.findViewById(R.id.attraction_cover_loading_container);
+                            loadingContainer.setVisibility(View.INVISIBLE);
+                            ((MainActivity)requireActivity()).enableTabs();
+                            loading = false;
+                            return false;
+                        }
+
+                        @Override
+                        public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                            LinearLayout loadingContainer = attractionView.findViewById(R.id.attraction_cover_loading_container);
+                            loadingContainer.setVisibility(View.INVISIBLE);
+                            ((MainActivity)requireActivity()).enableTabs();
+                            loading = false;
+                            return false;
+                        }
+                    })
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .placeholder(R.drawable.default_image)
                     .into(coverImageView);
@@ -486,6 +568,10 @@ public class AttractionFragment extends Fragment {
         if (requestCode == AUTOCOMPLETE_REQUEST_CODE) {
 
             if (resultCode == Activity.RESULT_OK) {
+
+                ((MainActivity)requireActivity()).disableTabs();
+                loading = true;
+
                 Place place = Autocomplete.getPlaceFromIntent(data);
 
                 PhotoMetadata photoMetadata = place.getPhotoMetadatas().get(0);
@@ -498,11 +584,12 @@ public class AttractionFragment extends Fragment {
                 LinearLayout loadingContainer = getActivity().findViewById(R.id.attraction_cover_loading_container);
                 loadingContainer.setVisibility(View.VISIBLE);
 
-                placesClient.fetchPhoto(photoRequest)
-                        .addOnSuccessListener(new OnSuccessListener<FetchPhotoResponse>() {
-                            @Override
-                            public void onSuccess(FetchPhotoResponse fetchPhotoResponse) {
-                                Bitmap bitmap = fetchPhotoResponse.getBitmap();
+                    placesClient.fetchPhoto(photoRequest)
+                            .addOnSuccessListener(new OnSuccessListener<FetchPhotoResponse>() {
+                                @Override
+                                public void onSuccess(FetchPhotoResponse fetchPhotoResponse) {
+
+                                    Bitmap bitmap = fetchPhotoResponse.getBitmap();
 
                                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                                 bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
@@ -517,8 +604,11 @@ public class AttractionFragment extends Fragment {
 
                                 loadingContainer.setVisibility(View.GONE);
 
-                                // Upload Image to firestore storage
-                                final FirebaseStorage storage = FirebaseStorage.getInstance();
+                                    ((MainActivity)requireActivity()).enableTabs();
+                                    loading = false;
+
+                                    // Upload Image to firestore storage
+                                    final FirebaseStorage storage = FirebaseStorage.getInstance();
 
                                 final UUID imageUUID = UUID.randomUUID();
 
@@ -536,31 +626,95 @@ public class AttractionFragment extends Fragment {
 
                                                     Log.i(TAG, "Successfully loaded cover image");
 
-                                                });
-                                    }
-                                })
-                                        .addOnFailureListener(new OnFailureListener() {
-                                            @Override
-                                            public void onFailure(@NonNull Exception e) {
-                                                System.out.println("FAILING");
-                                            }
-                                        });
-                            }
-                        })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                System.out.println("FAILING");
-                            }
-                        });
+                                                    });
+                                        }
+                                    })
+                                            .addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception e) {
+                                                    Log.w(TAG, "Failed to upload attraction cover image from Places API");
+                                                    ((MainActivity)requireActivity()).enableTabs();
+                                                    loading = false;
+                                                }
+                                            });
+                                }
+                            })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Log.w(TAG, "Failed to fetch attraction photo from Places API");
+                                    ((MainActivity)requireActivity()).enableTabs();
+                                    loading = false;
+                                }
+                            });
+                }
+                else {
+
+                    ((MainActivity)requireActivity()).enableTabs();
+                    loading = false;
+
+                    // Load image into view
+                    Glide.with(requireContext())
+                            .load(R.drawable.default_image)
+                            .diskCacheStrategy(DiskCacheStrategy.ALL)
+                            .into(coverImageView);
+                }
 
                 attractionViewModel.setReturnedFromSearch(true);
 
                 attractionViewModel.getSelectedAttraction().setName(place.getName());
                 attractionViewModel.getSelectedAttraction().setLocation(place.getAddress());
+                attractionViewModel.getSelectedAttraction().setLat(Objects.requireNonNull(place.getLatLng()).latitude);
+                attractionViewModel.getSelectedAttraction().setLon(Objects.requireNonNull(place.getLatLng()).longitude);
 
+                // Get updated weather
+                Weather.getWeather(attractionViewModel.getSelectedAttraction().getLat(), attractionViewModel.getSelectedAttraction().getLon(), getContext());
+
+                // get temperature
+                // Wait for the weather api to receive the data
+                if (attractionViewModel.getSelectedAttraction().getWeather() != null && attractionViewModel.getSelectedAttraction().getStartDate() != null) {
+
+                    for (Map.Entry<String, String> entry : attractionViewModel.getSelectedAttraction().getWeather().entrySet()) {
+                        String aDateString = entry.getKey();
+
+                        java.text.DateFormat formatter = new SimpleDateFormat("E MMM dd HH:mm:ss z yyyy");
+
+                        Calendar calendar = Calendar.getInstance();
+
+                        try {
+                            Date aDate = formatter.parse(aDateString);
+                            calendar.setTime(aDate);
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                            Log.e(TAG, "Error converting string date");
+                        }
+
+                        String temperature = entry.getValue();
+
+                        int aMonth = calendar.get(Calendar.MONTH);
+                        int aDay = calendar.get(Calendar.DAY_OF_MONTH);
+                        int aYear = calendar.get(Calendar.YEAR);
+
+                        Calendar newCalendar = Calendar.getInstance();
+
+                        newCalendar.setTime(attractionViewModel.getSelectedAttraction().getStartDate());
+
+                        int startMonth = newCalendar.get(Calendar.MONTH);
+                        int startDay = newCalendar.get(Calendar.DAY_OF_MONTH);
+                        int startYear = newCalendar.get(Calendar.YEAR);
+
+                        if (aMonth == startMonth && aDay == startDay && aYear == startYear) {
+                            weatherTextView.setText(String.format("%s ℉", temperature));
+                            break;
+                        }
+                        else
+                            weatherTextView.setText("N/A");
+                    }
+                }
             }
             else if (resultCode == AutocompleteActivity.RESULT_ERROR) {
+                ((MainActivity)requireActivity()).enableTabs();
+                loading = false;
                 Status status = Autocomplete.getStatusFromIntent(data);
                 Log.i(TAG, status.getStatusMessage());
             }
@@ -622,6 +776,7 @@ public class AttractionFragment extends Fragment {
     private void setupUpdateAttractionButton(View view){
 
         updateAttractionButton.setOnClickListener(v -> {
+
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM/dd/yyyy");
             // first get the information from each EditText
             String name = nameEditText.getText().toString();
@@ -694,6 +849,9 @@ public class AttractionFragment extends Fragment {
                 tourViewModel.getSelectedTour().addAttraction(attractionDocumentReference);
             }
 
+            ((MainActivity)requireActivity()).disableTabs();
+            loading = true;
+
             db.collection("Attractions")
                     .document(attractionViewModel.getSelectedAttraction().getAttractionUID())
                     .set(attractionViewModel.getSelectedAttraction())
@@ -703,10 +861,6 @@ public class AttractionFragment extends Fragment {
                         // update the attraction to the tour object in the firestore
                         db.collection("Tours").document(tourViewModel.getSelectedTour().getTourUID()).update("attractions", tourViewModel.getSelectedTour().getAttractions());
 
-                        // TODO: Setup alarm for start time
-                        if (tourViewModel.getSelectedTour().getNotifications())
-                            scheduleNotification();
-
                         if (attractionViewModel.isNewAttraction()) {
                             Toast.makeText(getContext(), "Successfully Added Attraction", Toast.LENGTH_SHORT).show();
                             getParentFragmentManager().popBackStack();
@@ -715,9 +869,14 @@ public class AttractionFragment extends Fragment {
                             Toast.makeText(getContext(), "Successfully Updated Attraction", Toast.LENGTH_SHORT).show();
                         }
 
+                        ((MainActivity)requireActivity()).enableTabs();
+                        loading = false;
                     })
-                    .addOnFailureListener(e -> Log.w(TAG, "Error writing document"));
-
+                    .addOnFailureListener(e -> {
+                        ((MainActivity)requireActivity()).enableTabs();
+                        loading = false;
+                        Log.w(TAG, "Error writing document");
+                    });
         });
 
     }
@@ -781,50 +940,6 @@ public class AttractionFragment extends Fragment {
                     Log.d(TAG, "Tour written to Firestore");
                 })
                 .addOnFailureListener(e -> Log.w(TAG, "Error writing tour document"));
-    }
-    private void scheduleNotification() {
-
-        // Create view button
-        Intent viewIntent = new Intent(getContext(), MainActivity.class);
-        viewIntent.putExtra("viewId", 1);
-        PendingIntent viewPendingIntent = PendingIntent.getActivity(getContext(), 0, viewIntent, 0);
-
-        // Build the notification to display
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(requireContext(), "2");
-        builder.setContentTitle("Attraction Started");
-        builder.setContentText(attractionViewModel.getSelectedAttraction().getName() + " has started");
-        builder.setSmallIcon(R.drawable.ic_launcher_foreground);
-        builder.setChannelId("2");
-        builder.setContentIntent(viewPendingIntent);
-        builder.setAutoCancel(true);
-        builder.addAction(R.drawable.ic_profile, "View", viewPendingIntent);
-        Notification notification = builder.build();
-
-        // Get Tour Start Date
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(attractionViewModel.getSelectedAttraction().getStartDate());
-
-        try {
-            String startTime = attractionViewModel.getSelectedAttraction().getStartTime();
-            SimpleDateFormat df = new SimpleDateFormat("hh:mm aa");
-            Date date = df.parse(startTime);
-            calendar.set(Calendar.HOUR, date.getHours());
-            calendar.set(Calendar.MINUTE, date.getMinutes());
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
-        // Initialize the alarm manager
-        AlarmManager alarmMgr = (AlarmManager)getContext().getSystemService(Context.ALARM_SERVICE);
-        Intent intent = new Intent(getContext(), AlarmBroadcastReceiver.class);
-        String notification_id = String.valueOf(System.currentTimeMillis() % 10000);
-        intent.putExtra(AlarmBroadcastReceiver.NOTIFICATION_ID, notification_id);
-        intent.putExtra(AlarmBroadcastReceiver.NOTIFICATION, notification);
-        intent.putExtra("NOTIFICATION_CHANNEL_ID", "2");
-        intent.putExtra("NOTIFICATION_CHANNEL_NAME", "Attraction Start");
-        PendingIntent alarmIntent = PendingIntent.getBroadcast(getContext(), Integer.parseInt(notification_id), intent, PendingIntent.FLAG_ONE_SHOT);
-        alarmMgr.setExact(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), alarmIntent);
-
     }
 
     public void startAutoCompleteActivity(View view) {

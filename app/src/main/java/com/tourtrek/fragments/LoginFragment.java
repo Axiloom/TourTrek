@@ -100,6 +100,8 @@ public class LoginFragment extends Fragment {
             }
             else {
 
+                ((MainActivity)requireActivity()).disableTabs();
+
                 mAuth.signInWithEmailAndPassword(email, password)
                         .addOnCompleteListener(requireActivity(), task -> {
                             if (task.isSuccessful()) {
@@ -133,6 +135,8 @@ public class LoginFragment extends Fragment {
                                                 // Stop showing progress bar
                                                 view.findViewById(R.id.login_loading_pb).setVisibility(View.GONE);
                                             }
+
+                                            ((MainActivity)requireActivity()).enableTabs();
                                         });
 
                             } else {
@@ -144,6 +148,8 @@ public class LoginFragment extends Fragment {
 
                                 // Stop loading progress circle
                                 view.findViewById(R.id.login_loading_pb).setVisibility(View.GONE);
+
+                                ((MainActivity)requireActivity()).enableTabs();
                             }
                         });
             }

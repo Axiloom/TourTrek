@@ -117,9 +117,12 @@ public class CurrentTourAttractionsAdapter extends RecyclerView.Adapter<CurrentT
         notifyDataSetChanged();
     }
 
-    public List<Attraction> getDataSet() {
-
+    public List<Attraction> getDataSetCopy() {
         return currentTourAttractionsDataSetCopy;
+    }
+
+    public List<Attraction> getDataSet() {
+        return currentTourAttractionsDataSet;
     }
 
     public void copyAttractions(List<Attraction> attractions){

@@ -11,9 +11,11 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.text.format.DateFormat;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -74,8 +76,8 @@ import java.util.UUID;
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
-    private static final int AUTOCOMPLETE_REQUEST_CODE = 4588;
     private FirebaseAuth mAuth;
+    public static boolean loading;
     public static User user;
 
     @Override
@@ -267,6 +269,26 @@ public class MainActivity extends AppCompatActivity {
         DatePickerDialog datePickerDialog = new DatePickerDialog(this, dateSetListener, year, month, day);
 
         datePickerDialog.show();
+    }
+
+    /**
+     * Disable any tabs from being clicked
+     */
+    public void disableTabs() {
+        BottomNavigationView bottomNavigationView = findViewById(R.id.nav_view);
+        for (int i = 0 ; bottomNavigationView != null && i < bottomNavigationView.getMenu().size(); i++) {
+            bottomNavigationView.getMenu().getItem(i).setEnabled(false);
+        }
+    }
+
+    /**
+     * Enable all tabs from being clicked
+     */
+    public void enableTabs() {
+        BottomNavigationView bottomNavigationView = findViewById(R.id.nav_view);
+        for (int i = 0 ; bottomNavigationView != null && i < bottomNavigationView.getMenu().size(); i++) {
+            bottomNavigationView.getMenu().getItem(i).setEnabled(true);
+        }
     }
 
 }

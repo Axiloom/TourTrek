@@ -25,20 +25,20 @@ jobs:
       - name: Assemble app debug APK
         run: bash ./gradlew assembleDebug --stacktrace
         
-      - name: Upload app APK
-        uses: actions/upload-artifact@v1
-        with:
-          name: app-debug
-          path: app/build/outputs/apk/debug/app-debug.apk
+#       - name: Upload app APK
+#         uses: actions/upload-artifact@v1
+#         with:
+#           name: app-debug
+#           path: app/build/outputs/apk/debug/app-debug.apk
 
       - name: Assemble Android Instrumentation Tests
         run: bash ./gradlew assembleDebugAndroidTest
         
-      - name: Upload Android Test APK
-        uses: actions/upload-artifact@v1
-        with:
-          name: app-debug-androidTest
-          path: app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
+#       - name: Upload Android Test APK
+#         uses: actions/upload-artifact@v1
+#         with:
+#           name: app-debug-androidTest
+#           path: app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
     
   test:
     name: Run Unit Tests

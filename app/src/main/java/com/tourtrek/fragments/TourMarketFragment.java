@@ -184,6 +184,8 @@ public class TourMarketFragment extends Fragment implements AdapterView.OnItemSe
         // Setup basic query information
         Query query = toursCollection.whereEqualTo("publiclyAvailable", true);
 
+        ((MainActivity)requireActivity()).disableTabs();
+
         // Query database
         query
                 .get()
@@ -209,6 +211,9 @@ public class TourMarketFragment extends Fragment implements AdapterView.OnItemSe
 
                             // Stop showing refresh decorator
                             swipeRefreshLayout.setRefreshing(false);
+
+                            if (isAdded())
+                                ((MainActivity)requireContext()).enableTabs();
                         }
                         else {
                             Log.w(TAG, "Error retrieving tours from firestore: ", task.getException());
