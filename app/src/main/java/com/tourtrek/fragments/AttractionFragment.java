@@ -11,6 +11,9 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.location.Location;
+import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.location.Location;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -40,6 +43,9 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
@@ -73,6 +79,9 @@ import com.tourtrek.adapters.CurrentPersonalToursAdapter;
 import com.tourtrek.data.Attraction;
 import com.tourtrek.notifications.AlarmBroadcastReceiver;
 import com.tourtrek.utilities.PlacesLocal;
+
+import com.tourtrek.utilities.Weather;
+
 import com.tourtrek.viewModels.AttractionViewModel;
 import com.tourtrek.viewModels.TourViewModel;
 import com.tourtrek.data.Tour;
@@ -170,6 +179,7 @@ public class AttractionFragment extends Fragment {
         navigationAttractionButton = attractionView.findViewById(R.id.attraction_navigation_btn);
         buttonsContainer = attractionView.findViewById(R.id.attraction_buttons_container);
         searchAttractionButton = attractionView.findViewById(R.id.attraction_search_ib);
+        weatherTextView = attractionView.findViewById(R.id.attraction_weather_tv);
 
         searchAttractionButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -568,7 +578,7 @@ public class AttractionFragment extends Fragment {
         if (requestCode == AUTOCOMPLETE_REQUEST_CODE) {
 
             if (resultCode == Activity.RESULT_OK) {
-
+              
                 ((MainActivity)requireActivity()).disableTabs();
                 loading = true;
 
@@ -940,6 +950,24 @@ public class AttractionFragment extends Fragment {
                     Log.d(TAG, "Tour written to Firestore");
                 })
                 .addOnFailureListener(e -> Log.w(TAG, "Error writing tour document"));
+    }
+
+    public void startAutoCompleteActivity(View view) {
+        Intent intent = new Autocomplete.IntentBuilder(
+                AutocompleteActivityMode.FULLSCREEN,
+                Arrays.asList(Place.Field.NAME, Place.Field.ADDRESS, Place.Field.ADDRESS_COMPONENTS,
+                        Place.Field.PHOTO_METADATAS))
+                .setTypeFilter(TypeFilter.ESTABLISHMENT)
+                .build(requireContext());
+        startActivityForResult(intent, AUTOCOMPLETE_REQUEST_CODE);
+    }
+
+    public void updateCoverImage() {
+        Glide.with(getContext())
+                .load(attractionViewModel.getSelectedAttraction().getCoverImageURI())
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .placeholder(R.drawable.default_image)
+                .into(coverImageView);
     }
 
     public void startAutoCompleteActivity(View view) {
