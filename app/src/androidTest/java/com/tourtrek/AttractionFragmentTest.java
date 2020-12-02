@@ -18,6 +18,7 @@ import org.junit.Test;
 import java.util.concurrent.TimeUnit;
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.espresso.Espresso;
+import androidx.test.espresso.ViewInteraction;
 import androidx.test.espresso.contrib.PickerActions;
 import androidx.test.espresso.contrib.RecyclerViewActions;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
@@ -25,6 +26,7 @@ import androidx.test.uiautomator.UiObjectNotFoundException;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.contrib.RecyclerViewActions.actionOnItemAtPosition;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static com.tourtrek.EspressoExtensions.nestedScrollTo;
 import static com.tourtrek.EspressoExtensions.waitForView;
@@ -32,6 +34,7 @@ import static androidx.test.espresso.action.ViewActions.closeSoftKeyboard;
 import static androidx.test.espresso.matcher.ViewMatchers.*;
 import static androidx.test.espresso.action.ViewActions.*;
 import static java.lang.Thread.sleep;
+import static org.hamcrest.Matchers.allOf;
 
 
 public class AttractionFragmentTest {
@@ -293,17 +296,31 @@ public class AttractionFragmentTest {
      * invalidDates
      * @param condition
      */
-    private void attractionConditionsTest(String condition){
+    private void attractionConditionsTest(String condition) throws InterruptedException {
         // attraction name
         if (condition.equals("noAttraction")){ onView(withId(R.id.attraction_name_et)).perform(typeText(""), closeSoftKeyboard()); }
         else { onView(withId(R.id.attraction_name_et)).perform(typeText("Some attraction"), closeSoftKeyboard()); }
 
         // location
         onView(withId(R.id.attraction_location_et)).perform(nestedScrollTo());
-        if (condition.equals("noLocation")){onView(withId(R.id.attraction_location_et)).perform(typeText(""), closeSoftKeyboard()); }
-        else {onView(withId(R.id.attraction_location_et)).perform(typeText("330 N. Orchard St., Madison, WI, USA"), closeSoftKeyboard()); }
+//        if (condition.equals("noLocation")){onView(withId(R.id.attraction_location_et)).perform(typeText(""), closeSoftKeyboard()); }
+//        else {onView(withId(R.id.attraction_location_et)).perform(typeText("330 N. Orchard St., Madison, WI, USA"), closeSoftKeyboard()); }
+        if (condition.equals("noLocation") || condition.equals("noAttraction") ){}
+        else {
+            onView(withId(R.id.attraction_search_ib)).perform(click());
+            sleep(1000);
+            onView(withId(R.id.places_autocomplete_search_bar)).perform(typeText("Wisconsin Institute for Discovery"));
+            sleep(1000);
+            ViewInteraction recyclerView = onView(
+                    allOf(withId(R.id.places_autocomplete_list),
+                            childAtPosition(
+                                    withId(R.id.places_autocomplete_content),
+                                    3)));
+            recyclerView.perform(actionOnItemAtPosition(0, click()));
+        }
 
         // cost
+        onView(isRoot()).perform(waitForView(R.id.attraction_name_et, TimeUnit.SECONDS.toMillis(100)));
         onView(withId(R.id.attraction_cost_et)).perform(nestedScrollTo());
         if (condition.equals("noCost")){onView(withId(R.id.attraction_cost_et)).perform(typeText(""), closeSoftKeyboard());}
         else {onView(withId(R.id.attraction_cost_et)).perform(typeText("0"), closeSoftKeyboard());}
@@ -353,6 +370,7 @@ public class AttractionFragmentTest {
         // scroll to the "add attraction" button and click it
         onView(withId(R.id.attraction_update_btn)).perform(nestedScrollTo());
         onView(withId(R.id.attraction_update_btn)).perform(click());
+        sleep(1000);
     }
 
     /**

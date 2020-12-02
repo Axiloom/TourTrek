@@ -353,7 +353,12 @@ public class PersonalToursFragment extends Fragment {
                                     pastSwipeRefreshLayout.setRefreshing(false);
                                 }
 
-                                ((MainActivity)requireActivity()).enableTabs();
+                                try {
+                                    ((MainActivity)requireActivity()).enableTabs();
+                                }
+                                catch (java.lang.IllegalStateException e){
+                                    Log.d("ToursFragment", "Not associated with an activity.");
+                                }
                             }
                         });
             }
