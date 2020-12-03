@@ -74,7 +74,7 @@ public class LoginFragmentTest {
         onView(withId(R.id.login_email_et)).perform(typeText("test@gmail.com"), closeSoftKeyboard());
         onView(withId(R.id.login_password_et)).perform(typeText("password"), closeSoftKeyboard());
         onView(withId(R.id.login_login_btn)).perform(click());
-        onView(isRoot()).perform(waitForView(R.id.personal_current_tours_title_btn, TimeUnit.SECONDS.toMillis(100)));
+        onView(isRoot()).perform(waitForView(R.id.personal_current_tours_title_btn, TimeUnit.SECONDS.toMillis(20)));
     }
 
 }

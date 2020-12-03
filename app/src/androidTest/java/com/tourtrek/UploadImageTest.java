@@ -69,18 +69,18 @@ public class UploadImageTest {
 
         // log out of any current account, log into the test account, navigate to the personal tours tab, and select the first tour in the future tours section
         try {
-            onView(isRoot()).perform(waitForView(R.id.navigation_profile, TimeUnit.SECONDS.toMillis(100)));
+            onView(isRoot()).perform(waitForView(R.id.navigation_profile, TimeUnit.SECONDS.toMillis(20)));
             onView(withId(R.id.navigation_profile)).perform(click());
             onView(withId(R.id.profile_logout_btn)).perform(click());
         } catch (Exception NoMatchingViewException) {
             Log.w(TAG, "Not logged in");
         } finally {
             onView(withId(R.id.navigation_tours)).perform(click());
-            onView(isRoot()).perform(waitForView(R.id.login_email_et, TimeUnit.SECONDS.toMillis(100)));
+            onView(isRoot()).perform(waitForView(R.id.login_email_et, TimeUnit.SECONDS.toMillis(20)));
             onView(withId(R.id.login_email_et)).perform(typeText("cctest@gmail.com"), closeSoftKeyboard());
             onView(withId(R.id.login_password_et)).perform(typeText("123456"), closeSoftKeyboard());
             onView(withId(R.id.login_login_btn)).perform(click());
-            onView(isRoot()).perform(waitForView(R.id.personal_future_tours_title_btn, TimeUnit.SECONDS.toMillis(100)));
+            onView(isRoot()).perform(waitForView(R.id.personal_future_tours_title_btn, TimeUnit.SECONDS.toMillis(20)));
             onView(withId(R.id.personal_future_tours_title_btn)).perform(click());
 
         }

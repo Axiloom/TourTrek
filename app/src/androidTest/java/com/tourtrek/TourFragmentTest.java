@@ -60,18 +60,18 @@ public class TourFragmentTest {
 
         // log out of any current account, log into the test account, navigate to the personal tours tab, and select the first tour in the future tours section
         try {
-            onView(isRoot()).perform(waitForView(R.id.navigation_profile, TimeUnit.SECONDS.toMillis(100)));
+            onView(isRoot()).perform(waitForView(R.id.navigation_profile, TimeUnit.SECONDS.toMillis(20)));
             onView(withId(R.id.navigation_profile)).perform(click());
             onView(withId(R.id.profile_logout_btn)).perform(click());
         } catch (Exception NoMatchingViewException) {
             Log.w(TAG, "Not logged in");
         } finally {
             onView(withId(R.id.navigation_tours)).perform(click());
-            onView(isRoot()).perform(waitForView(R.id.login_email_et, TimeUnit.SECONDS.toMillis(100)));
+            onView(isRoot()).perform(waitForView(R.id.login_email_et, TimeUnit.SECONDS.toMillis(20)));
             onView(withId(R.id.login_email_et)).perform(typeText("cctest@gmail.com"), closeSoftKeyboard());
             onView(withId(R.id.login_password_et)).perform(typeText("123456"), closeSoftKeyboard());
             onView(withId(R.id.login_login_btn)).perform(click());
-            onView(isRoot()).perform(waitForView(R.id.personal_future_tours_title_btn, TimeUnit.SECONDS.toMillis(100)));
+            onView(isRoot()).perform(waitForView(R.id.personal_future_tours_title_btn, TimeUnit.SECONDS.toMillis(20)));
             onView(withId(R.id.personal_future_tours_title_btn)).perform(click());
 
         }
@@ -140,7 +140,7 @@ public class TourFragmentTest {
 
         // find the newly made attraction and select it
         onView(withId(R.id.personal_past_tours_rv)).perform(RecyclerViewActions.actionOnItemAtPosition(0,click()));
-        onView(isRoot()).perform(waitForView(R.id.tour_delete_btn, TimeUnit.SECONDS.toMillis(1000)));
+        onView(isRoot()).perform(waitForView(R.id.tour_delete_btn, TimeUnit.SECONDS.toMillis(20)));
         onView(withId(R.id.tour_delete_btn)).perform(nestedScrollTo());
         onView(withId(R.id.tour_delete_btn)).perform(click());
 
@@ -171,49 +171,49 @@ public class TourFragmentTest {
 //        onView(withText("Tour removed")).inRoot(new ToastMatcher()).check(matches(isDisplayed()));
 //    }
 
-    /**
-     * Test deletion of a tour
-     */
-    @Test
-    public void deletionPublicTourTest() throws InterruptedException {
-        tourConditionsTest("deletionPublic");
-
-        onView(isRoot()).perform(waitForView(R.id.personal_past_tours_rv, TimeUnit.SECONDS.toMillis(100)));
-
-        sleep(1000); // give time for the recycler view items to load
-
-        // find the newly made attraction and select it
-        onView(withId(R.id.personal_past_tours_rv)).perform(RecyclerViewActions.actionOnItemAtPosition(0,click()));
-        onView(isRoot()).perform(waitForView(R.id.tour_public_cb, TimeUnit.SECONDS.toMillis(1000)));
-        onView(withId(R.id.tour_delete_btn)).perform(nestedScrollTo());
-        onView(withId(R.id.tour_delete_btn)).perform(click());
-        sleep(1000);
-
-        // check for the proper toast message
-        onView(withText("You cannot delete a public tour!")).inRoot(new ToastMatcher()).check(matches(isDisplayed()));
-
-        onView(withId(R.id.navigation_tours)).perform(click());
-
-        onView(isRoot()).perform(waitForView(R.id.personal_past_tours_rv, TimeUnit.SECONDS.toMillis(100)));
-
-        sleep(1000); // give time for the recycler view items to load
-
-        // find the newly made attraction and select it
-        onView(withId(R.id.personal_past_tours_rv)).perform(RecyclerViewActions.actionOnItemAtPosition(0,click()));
-        onView(isRoot()).perform(waitForView(R.id.tour_public_cb, TimeUnit.SECONDS.toMillis(1000)));
-        onView(withId(R.id.tour_public_cb)).perform(nestedScrollTo());
-        onView(withId(R.id.tour_public_cb)).perform(click());
-        onView(withId(R.id.tour_update_btn)).perform(nestedScrollTo());
-        onView(withId(R.id.tour_update_btn)).perform(click());
-
-        sleep(1000); // give time for the recycler view items to load
-
-        // find the newly made attraction and select it
-        onView(withId(R.id.personal_past_tours_rv)).perform(RecyclerViewActions.actionOnItemAtPosition(0,click()));
-        onView(isRoot()).perform(waitForView(R.id.tour_delete_btn, TimeUnit.SECONDS.toMillis(1000)));
-        onView(withId(R.id.tour_delete_btn)).perform(nestedScrollTo());
-        onView(withId(R.id.tour_delete_btn)).perform(click());
-    }
+//    /**
+//     * Test deletion of a tour
+//     */
+//    @Test
+//    public void deletionPublicTourTest() throws InterruptedException {
+//        tourConditionsTest("deletionPublic");
+//
+//        onView(isRoot()).perform(waitForView(R.id.personal_past_tours_rv, TimeUnit.SECONDS.toMillis(20)));
+//
+//        sleep(1000); // give time for the recycler view items to load
+//
+//        // find the newly made attraction and select it
+//        onView(withId(R.id.personal_past_tours_rv)).perform(RecyclerViewActions.actionOnItemAtPosition(0,click()));
+//        onView(isRoot()).perform(waitForView(R.id.tour_public_cb, TimeUnit.SECONDS.toMillis(20)));
+//        onView(withId(R.id.tour_delete_btn)).perform(nestedScrollTo());
+//        onView(withId(R.id.tour_delete_btn)).perform(click());
+//        sleep(1000);
+//
+//        // check for the proper toast message
+//        onView(withText("You cannot delete a public tour!")).inRoot(new ToastMatcher()).check(matches(isDisplayed()));
+//
+//        onView(withId(R.id.navigation_tours)).perform(click());
+//
+//        onView(isRoot()).perform(waitForView(R.id.personal_past_tours_rv, TimeUnit.SECONDS.toMillis(20)));
+//
+//        sleep(1000); // give time for the recycler view items to load
+//
+//        // find the newly made attraction and select it
+//        onView(withId(R.id.personal_past_tours_rv)).perform(RecyclerViewActions.actionOnItemAtPosition(0,click()));
+//        onView(isRoot()).perform(waitForView(R.id.tour_public_cb, TimeUnit.SECONDS.toMillis(20)));
+//        onView(withId(R.id.tour_public_cb)).perform(nestedScrollTo());
+//        onView(withId(R.id.tour_public_cb)).perform(click());
+//        onView(withId(R.id.tour_update_btn)).perform(nestedScrollTo());
+//        onView(withId(R.id.tour_update_btn)).perform(click());
+//
+//        sleep(1000); // give time for the recycler view items to load
+//
+//        // find the newly made attraction and select it
+//        onView(withId(R.id.personal_past_tours_rv)).perform(RecyclerViewActions.actionOnItemAtPosition(0,click()));
+//        onView(isRoot()).perform(waitForView(R.id.tour_delete_btn, TimeUnit.SECONDS.toMillis(20)));
+//        onView(withId(R.id.tour_delete_btn)).perform(nestedScrollTo());
+//        onView(withId(R.id.tour_delete_btn)).perform(click());
+//    }
 
 
     /**

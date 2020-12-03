@@ -54,20 +54,20 @@ public class PersonalToursFragmentTest {
 
         // log out of any current account, log into the test account, navigate to the personal tours tab, and tap the button for adding a tour
         try {
-            onView(isRoot()).perform(waitForView(R.id.navigation_profile, TimeUnit.SECONDS.toMillis(100)));
+            onView(isRoot()).perform(waitForView(R.id.navigation_profile, TimeUnit.SECONDS.toMillis(20)));
             onView(withId(R.id.navigation_profile)).perform(click());
             onView(withId(R.id.profile_logout_btn)).perform(click());
         } catch (Exception NoMatchingViewException) {
             Log.w(TAG, "Not logged in");
         } finally {
-            onView(isRoot()).perform(waitForView(R.id.navigation_tours, TimeUnit.SECONDS.toMillis(100)));
+            onView(isRoot()).perform(waitForView(R.id.navigation_tours, TimeUnit.SECONDS.toMillis(20)));
             onView(withId(R.id.navigation_tours)).perform(click());
-            onView(isRoot()).perform(waitForView(R.id.login_email_et, TimeUnit.SECONDS.toMillis(100)));
+            onView(isRoot()).perform(waitForView(R.id.login_email_et, TimeUnit.SECONDS.toMillis(20)));
           
             onView(withId(R.id.login_email_et)).perform(typeText("jrawlins@wisc.edu"), closeSoftKeyboard());
             onView(withId(R.id.login_password_et)).perform(typeText("123456"), closeSoftKeyboard());
             onView(withId(R.id.login_login_btn)).perform(click());
-            onView(isRoot()).perform(waitForView(R.id.personal_future_tours_title_btn, TimeUnit.SECONDS.toMillis(100)));
+            onView(isRoot()).perform(waitForView(R.id.personal_future_tours_title_btn, TimeUnit.SECONDS.toMillis(20)));
             onView(withId(R.id.personal_future_tours_title_btn)).perform(click());
         }
     }
@@ -80,7 +80,7 @@ public class PersonalToursFragmentTest {
         tourDateConditionsTest("future");
 
         // wait for the personal tours tab to be visible with updated recycler views
-        onView(isRoot()).perform(waitForView(R.id.personal_future_tours_title_btn, TimeUnit.SECONDS.toMillis(100)));
+        onView(isRoot()).perform(waitForView(R.id.personal_future_tours_title_btn, TimeUnit.SECONDS.toMillis(20)));
         sleep(1000);
 
         // check the the tour appears in the right bin
@@ -91,7 +91,7 @@ public class PersonalToursFragmentTest {
         catch(androidx.test.espresso.PerformException e){
             onView(withId(R.id.personal_future_tours_rv)).perform(RecyclerViewActions.actionOnItemAtPosition(0, click()));
         }
-        onView(isRoot()).perform(waitForView(R.id.tour_name_et, TimeUnit.SECONDS.toMillis(100)));
+        onView(isRoot()).perform(waitForView(R.id.tour_name_et, TimeUnit.SECONDS.toMillis(20)));
         //sleep(1000);
 
 //        onView(withId(R.id.tour_name_et)).check(matches(withText("future tour")));
@@ -112,7 +112,7 @@ public class PersonalToursFragmentTest {
         tourDateConditionsTest("current");
 
         // wait for the personal tours tab to be visible with updated recycler views
-        onView(isRoot()).perform(waitForView(R.id.personal_current_tours_rv, TimeUnit.SECONDS.toMillis(100)));
+        onView(isRoot()).perform(waitForView(R.id.personal_current_tours_rv, TimeUnit.SECONDS.toMillis(20)));
         sleep(1000);
 
         // check the the tour appears in the right bin
@@ -123,7 +123,7 @@ public class PersonalToursFragmentTest {
         catch(androidx.test.espresso.PerformException e){
             onView(withId(R.id.personal_current_tours_rv)).perform(RecyclerViewActions.actionOnItemAtPosition(0, click()));
         }
-        onView(isRoot()).perform(waitForView(R.id.tour_name_et, TimeUnit.SECONDS.toMillis(100)));
+        onView(isRoot()).perform(waitForView(R.id.tour_name_et, TimeUnit.SECONDS.toMillis(20)));
         sleep(1000);
 
 //        onView(withId(R.id.tour_name_et)).check(matches(withText("current tour")));
@@ -144,7 +144,7 @@ public class PersonalToursFragmentTest {
         tourDateConditionsTest("past");
 
         // wait for the personal tours tab to be visible with updated recycler views
-        onView(isRoot()).perform(waitForView(R.id.personal_future_tours_title_btn, TimeUnit.SECONDS.toMillis(100)));
+        onView(isRoot()).perform(waitForView(R.id.personal_future_tours_title_btn, TimeUnit.SECONDS.toMillis(20)));
         sleep(1000);
 
         // check the the tour appears in the right bin
@@ -155,7 +155,7 @@ public class PersonalToursFragmentTest {
         catch(androidx.test.espresso.PerformException e){
             onView(withId(R.id.personal_past_tours_rv)).perform(RecyclerViewActions.actionOnItemAtPosition(0, click()));
         }
-        onView(isRoot()).perform(waitForView(R.id.tour_end_date_btn, TimeUnit.SECONDS.toMillis(100)));
+        onView(isRoot()).perform(waitForView(R.id.tour_end_date_btn, TimeUnit.SECONDS.toMillis(20)));
         sleep(1000);
 
 //        onView(withId(R.id.tour_name_et)).check(matches(withText("past tour")));
@@ -178,7 +178,7 @@ public class PersonalToursFragmentTest {
      */
     private void tourDateConditionsTest(String condition){
         // name
-        onView(isRoot()).perform(waitForView(R.id.tour_name_et, TimeUnit.SECONDS.toMillis(100)));
+        onView(isRoot()).perform(waitForView(R.id.tour_name_et, TimeUnit.SECONDS.toMillis(20)));
         onView(withId(R.id.tour_name_et)).perform(typeText(condition + " tour"), closeSoftKeyboard());
 
         // location
@@ -222,7 +222,7 @@ public class PersonalToursFragmentTest {
      */
     private void removeAdded() throws InterruptedException {
         // find the newly made attraction and select it
-        onView(isRoot()).perform(waitForView(R.id.tour_attractions_rv, TimeUnit.SECONDS.toMillis(1000)));
+        onView(isRoot()).perform(waitForView(R.id.tour_attractions_rv, TimeUnit.SECONDS.toMillis(20)));
         sleep(1000);
         onView(withId(R.id.tour_delete_btn)).perform(nestedScrollTo());
         onView(withId(R.id.tour_delete_btn)).perform(click());
