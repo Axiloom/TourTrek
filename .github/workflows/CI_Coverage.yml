@@ -43,5 +43,5 @@ jobs:
           name: Automated Github Upload
           # Repository upload token - get it from codecov.io. Required only for private repositories
           token: 8e4ab1e4-c15e-4eb8-8319-60f50827111a
-          # Directory to search for coverage reports.
-          directory: TourTrek/app/build/reports
+          files: TourTrek/app/build/reports/coverage/debug/*
+
