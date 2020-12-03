@@ -309,7 +309,12 @@ public class AttractionFragment extends Fragment {
                         public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
                             LinearLayout loadingContainer = attractionView.findViewById(R.id.attraction_cover_loading_container);
                             loadingContainer.setVisibility(View.INVISIBLE);
-                            ((MainActivity)requireActivity()).enableTabs();
+                            try {
+                                ((MainActivity)requireActivity()).enableTabs();
+                            }
+                            catch (java.lang.IllegalStateException e){
+                                Log.d("AttractionFragment", "Not associated with an activity.");
+                            }
                             loading = false;
                             return false;
                         }
