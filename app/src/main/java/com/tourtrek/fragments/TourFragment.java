@@ -174,7 +174,6 @@ public class TourFragment extends Fragment implements AdapterView.OnItemSelected
     private Button myFacebookShareButton;
     private RelativeLayout checkBoxesContainer;
     private LinearLayout buttonsContainer;
-    private Button shareButton;
     private CallbackManager callbackManager;
     private ShareDialog shareDialog;
     private ImageView coverImageView;
@@ -383,11 +382,15 @@ public class TourFragment extends Fragment implements AdapterView.OnItemSelected
             tourViewModel.setIsUserOwned(true);
         }
         else {
-            nameEditText.setText(tourViewModel.getSelectedTour().getName());
-            locationEditText.setText(tourViewModel.getSelectedTour().getLocation());
+            if (tourViewModel.getSelectedTour().getName() != null)
+                nameEditText.setText(tourViewModel.getSelectedTour().getName());
+            if (tourViewModel.getSelectedTour().getLocation() != null)
+                locationEditText.setText(tourViewModel.getSelectedTour().getLocation());
             costEditText.setText(String.format("$%.2f", tourViewModel.getSelectedTour().getCost()));
-            startDateButton.setText(tourViewModel.getSelectedTour().retrieveStartDateAsString());
-            endDateButton.setText(tourViewModel.getSelectedTour().retrieveEndDateAsString());
+            if (tourViewModel.getSelectedTour().getStartDate() != null)
+                startDateButton.setText(tourViewModel.getSelectedTour().retrieveStartDateAsString());
+            if (tourViewModel.getSelectedTour().getEndDate() != null)
+                endDateButton.setText(tourViewModel.getSelectedTour().retrieveEndDateAsString());
             notificationsCheckBox.setChecked(tourViewModel.getSelectedTour().getNotifications());
             publicCheckBox.setChecked(tourViewModel.getSelectedTour().isPubliclyAvailable());
         }
@@ -928,7 +931,6 @@ public class TourFragment extends Fragment implements AdapterView.OnItemSelected
             }
 
             // parse date to firebase format
-            Date date;
             try {
                 tourViewModel.getSelectedTour().setStartDateFromString(startDateButton.getText().toString());
             } catch (ParseException e) {
@@ -958,6 +960,42 @@ public class TourFragment extends Fragment implements AdapterView.OnItemSelected
 
             ((MainActivity)requireActivity()).disableTabs();
             loading = true;
+
+            // Set all attraction dates to null if they fall outside the tour date
+            for(DocumentReference documentReference : tourViewModel.getSelectedTour().getAttractions()) {
+                documentReference.get()
+                        .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                            @Override
+                            public void onSuccess(DocumentSnapshot documentSnapshot) {
+
+                                Attraction attraction = documentSnapshot.toObject(Attraction.class);
+
+                                if (attraction.getStartDate() != null && attraction.getEndDate() != null) {
+                                    // Check if the attraction falls within the new tour dates
+                                    Calendar calendar = Calendar.getInstance();
+                                    calendar.setTime(attraction.getStartDate());
+                                    Timestamp attractionStartDate = new Timestamp(calendar.getTime());
+                                    calendar.setTime(attraction.getEndDate());
+                                    Timestamp attractionEndDate = new Timestamp(calendar.getTime());
+                                    calendar.setTime(tourViewModel.getSelectedTour().getStartDate());
+                                    Timestamp tourStartDate = new Timestamp(calendar.getTime());
+                                    calendar.setTime(tourViewModel.getSelectedTour().getEndDate());
+                                    Timestamp tourEndDate = new Timestamp(calendar.getTime());
+
+                                    if (attractionStartDate.compareTo(tourStartDate) < 0 || attractionEndDate.compareTo(tourEndDate) > 0) {
+                                        documentReference.update("startDate", null);
+                                        documentReference.update("endDate", null);
+                                    }
+                                }
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+
+                            }
+                        });
+            }
 
             db.collection("Tours").document(tourViewModel.getSelectedTour().getTourUID())
                     .set(tourViewModel.getSelectedTour())
@@ -1147,24 +1185,26 @@ public class TourFragment extends Fragment implements AdapterView.OnItemSelected
         // Set an alarm for each attraction within the tour
         for (Attraction attraction : attractionsAdapter.getDataSet()) {
 
-            try {
-                Calendar calendar = Calendar.getInstance();
-                calendar.setTime(attraction.getStartDate());
-                String startTime = attraction.getStartTime();
-                SimpleDateFormat df = new SimpleDateFormat("hh:mm aa");
-                Date date = df.parse(startTime);
-                calendar.set(Calendar.HOUR_OF_DAY, date.getHours());
-                calendar.set(Calendar.MINUTE, date.getMinutes());
+            if (attraction.getStartDate() != null && attraction.getEndDate() != null && attraction.getStartTime() != null && attraction.getEndTime() != null) {
+                try {
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.setTime(attraction.getStartDate());
+                    String startTime = attraction.getStartTime();
+                    SimpleDateFormat df = new SimpleDateFormat("hh:mm aa");
+                    Date date = df.parse(startTime);
+                    calendar.set(Calendar.HOUR_OF_DAY, date.getHours());
+                    calendar.set(Calendar.MINUTE, date.getMinutes());
 
-                Timestamp attractionStartDate = new Timestamp(calendar.getTime());
-                Timestamp now = Timestamp.now();
+                    Timestamp attractionStartDate = new Timestamp(calendar.getTime());
+                    Timestamp now = Timestamp.now();
 
-                // Only enable an alarm for the attraction if the attraction hasn't started yet
-                if (attractionStartDate.compareTo(now) > 0)
-                    setAlarmForAttraction(attraction);
+                    // Only enable an alarm for the attraction if the attraction hasn't started yet
+                    if (attractionStartDate.compareTo(now) > 0)
+                        setAlarmForAttraction(attraction);
 
-            } catch (ParseException e) {
-                e.printStackTrace();
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
             }
         }
 
