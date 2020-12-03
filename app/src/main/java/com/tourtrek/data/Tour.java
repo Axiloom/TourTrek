@@ -1,6 +1,5 @@
 package com.tourtrek.data;
 
-import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
 
 import java.text.DateFormat;
@@ -12,24 +11,54 @@ import java.util.List;
 
 public class Tour{
 
-    private String name;
-    private Date startDate;
-    private Date endDate;
-    private String location;
+    private String name; // constructor
+    private Date startDate; // constructor
+    private Date endDate; // constructor
+    private String location; // constructor
     private Long length;
-    private float cost;
-    private Boolean notifications;
-    private List<String> reviews;
-    private String description;
-    private Boolean publiclyAvailable;
+    private float cost; // constructor
+    private Boolean notifications; // constructor
+    private List<String> reviews; // constructor
+    private String description; // constructor
+    private Boolean publiclyAvailable; // constructor
     private List<DocumentReference> attractions;
-    private String coverImageURI;
-    private String tourUID;
+    private String coverImageURI; // constructor
+    private String tourUID; // constructor
+    private double totalRating;
+    private double rating;
 
     /**
      * Empty constructor needed for Firestore
      */
-    public Tour() {}
+    public Tour() {
+        this.reviews = new ArrayList<>();
+        this.totalRating = 0;
+        this.rating = 0;
+
+    }
+
+    /**
+     * Complete constructor
+     */
+    public Tour(String name, Date startDate, Date endDate, String location, float cost, Boolean notifications,
+                List<String> reviews, String description, Boolean publiclyAvailable, List<DocumentReference> attractions,
+                String coverImageURI, String tourUID){
+
+        // populate all fields except for length and attractions
+        this.name = name;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.location = location;
+        this.cost = cost;
+        this.notifications = notifications;
+        this.reviews = reviews;
+        this.description = description;
+        this.publiclyAvailable = publiclyAvailable;
+        this.attractions = attractions;
+        this.coverImageURI = coverImageURI;
+        this.tourUID = tourUID;
+
+    }
 
     /**
      * Getter for name
@@ -238,10 +267,7 @@ public class Tour{
     }
 
     public List<String> getReviews() {
-        if (this.reviews == null){
-            return new ArrayList<>();
-        }
-        return this.reviews;
+        return reviews;
     }
 
     public void setReviews(List<String> reviews) {
@@ -289,4 +315,23 @@ public class Tour{
         this.tourUID = tourUID;
     }
 
+    public double getTotalRating() {
+        return totalRating;
+    }
+
+    public void setTotalRating(double totalRating) {
+        this.totalRating = totalRating;
+    }
+
+    public double getRating() {
+        return rating;
+    }
+
+    public void setRating(double rating) {
+        this.rating = rating;
+    }
+
+    public void addUser (String user) {
+        this.reviews.add(user);
+    }
 }

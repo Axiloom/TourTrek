@@ -18,28 +18,56 @@
     <!--    <string name=""></string>-->
     <!--    <string name=""></string>-->
 
-    <string-array name="categories">
-        <item>Sort by</item>
-        <item>Name Ascending</item>
-        <item>Location Ascending</item>
-        <item>Duration Ascending</item>
-        <item>Name Descending</item>
-        <item>Location Descending</item>
-        <item>Duration Descending</item>
-    </string-array>
-
-    <string-array name="categories_attractions">
-        <item>Sort by</item>
-        <item>Name Ascending</item>
-        <item>Location Ascending</item>
-        <item>Cost Ascending</item>
-        <item>Name Descending</item>
-        <item>Location Descending</item>
-        <item>Cost Descending</item>
-    </string-array>
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="Edit_Success_TOAST_STRING">Successfully Updated Tour</string>
-    <string name="Add_Friend_Success_TOAST_STRING">Successfully Add Friend</string>
+    <string name="facebook_app_id">456155985393505</string>
+
+
+    <string name="terms_and_conditions">
+        1. Terms
+        \n
+        By accessing this app, you are agreeing to be bound by these apps Terms and Conditions of Use, all applicable laws and regulations, and agree that you are responsible for compliance with any applicable local laws. If you do not agree with any of these terms, you are prohibited from using or accessing this app. The materials contained in this app are protected by applicable copyright and trademark law.
+        \n
+        2. Use License
+        \n
+        a.	Permission is granted to temporarily download one copy of the materials (information or software) on TourTrek’s app for personal, non-commercial transitory viewing only. This is the grant of a license, not a transfer of title, and under this license you may not:
+        \n
+        i.	modify or copy the materials;
+        \n
+        ii.	use the materials for any commercial purpose, or for any public display (commercial or non-commercial);
+        \n
+        iii.	attempt to decompile or reverse engineer any software contained on TourTrek’s app;
+        \n
+        iv.	remove any copyright or other proprietary notations from the materials; or
+        \n
+        v.	transfer the materials to another person or "mirror" the materials on any other server.
+        \n
+        b.	This license shall automatically terminate if you violate any of these restrictions and may be terminated by TourTrek at any time. Upon terminating your viewing of these materials or upon the termination of this license, you must destroy any downloaded materials in your possession whether in electronic or printed format.
+        \n
+        3. Disclaimer
+        \n
+        a.	The materials on TourTrek’s app are provided "as is". TourTrek makes no warranties, expressed or implied, and hereby disclaims and negates all other warranties, including without limitation, implied warranties or conditions of merchantability, fitness for a particular purpose, or non-infringement of intellectual property or other violation of rights. Further, TourTrek does not warrant or make any representations concerning the accuracy, likely results, or reliability of the use of the materials on its app or otherwise relating to such materials or on any sites linked to this app.
+        \n
+        4. Limitations
+        \n
+        In no event shall TourTrek or its suppliers be liable for any damages (including, without limitation, damages for loss of data or profit, or due to business interruption,) arising out of the use or inability to use the materials on TourTrek’s app, even if TourTrek or a TourTrek authorized representative has been notified orally or in writing of the possibility of such damage. Because some jurisdictions do not allow limitations on implied warranties, or limitations of liability for consequential or incidental damages, these limitations may not apply to you.
+        \n
+        5. Revisions and Errata
+        \n
+        The materials appearing on TourTrek\'s app could include technical, typographical, or photographic errors. TourTrek does not warrant that any of the materials on its app are accurate, complete, or current. TourTrek may make changes to the materials contained on its app at any time without notice. TourTrek does not, however, make any commitment to update the materials.
+        \n
+        6. Links
+        \n
+        TourTrek has not reviewed all of the sites linked to its app and is not responsible for the contents of any such linked site. The inclusion of any link does not imply endorsement by TourTrek of the site. Use of any such linked web site is at the user\'s own risk. TourTrek does not warrant or make any representations concerning the accuracy, likely results, or reliability of the use of the materials on any sites linked to this app.
+        \n
+        7. Indemnity
+        \n
+        You agree to indemnify, hold harmless and defend TourTrek and TourTrek\'s affiliates, subsidiaries, officers, directors, employees, agents and licensors at your expense, against any and all third party claims, actions, proceedings and suits and all related liabilities, damages, settlements, penalties, fines, costs and expenses (including, without limitation, reasonable attorneys\' fees and other dispute resolution expenses) incurred by TourTrek arising out of or relating to (a) breach of any term of this Agreement or (b) violation of any law, rule or regulation or the rights of any third party or © your use of or access to TourTrek\'s app or intellectual property.
+        \n
+        8. Governing Law
+        \n
+        Any claim relating to TourTrek\'s app shall be governed by the laws of the State of Wisconsin without regard to its conflict of law provisions.
+        \n
+
+    </string>
 
 </resources>

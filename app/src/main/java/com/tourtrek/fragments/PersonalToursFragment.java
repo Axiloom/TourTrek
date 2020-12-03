@@ -79,6 +79,8 @@ public class PersonalToursFragment extends Fragment {
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
+        ((MainActivity)requireActivity()).disableTabs();
+
         View personalToursView = inflater.inflate(R.layout.fragment_personal_tours, container, false);
 
         mAuth = FirebaseAuth.getInstance();
@@ -116,6 +118,8 @@ public class PersonalToursFragment extends Fragment {
         configureRecyclerViews(personalToursView);
         configureSwipeRefreshLayouts(personalToursView);
         configureOnClickRecyclerView();
+
+        ((MainActivity)requireActivity()).enableTabs();
 
         return personalToursView;
     }
@@ -316,8 +320,6 @@ public class PersonalToursFragment extends Fragment {
         // Pull out the UID's of each tour that belongs to this user
         if (!MainActivity.user.getTours().isEmpty()) {
 
-            currentTourAdapter.clear();
-
             if (MainActivity.user.getTours().isEmpty())
                 ((MainActivity)requireActivity()).enableTabs();
 
@@ -335,23 +337,20 @@ public class PersonalToursFragment extends Fragment {
                                 Timestamp now = Timestamp.now();
 
                                 // the start date is before now and the end date is after now
-                                if (type.equals("current") && tourStartDate != null && tourStartDate.compareTo(now) < 0 && tourEndDate != null && tourEndDate.compareTo(now) > 0) {
-
+                                if (type.equals("current") && tourStartDate != null && tourStartDate.compareTo(now) < 0 && tourEndDate != null && tourEndDate.compareTo(now) > 0)
                                     currentTourAdapter.addNewData(documentSnapshot.toObject(Tour.class));
-                                    currentSwipeRefreshLayout.setRefreshing(false);
-                                }
+
                                 // the start date is after now and the end date is after now
-                                else if (type.equals("future") && tourStartDate != null && tourStartDate.compareTo(now) > 0 && tourEndDate != null && tourEndDate.compareTo(now) > 0) {
+                                else if (type.equals("future") && tourStartDate != null && tourStartDate.compareTo(now) > 0 && tourEndDate != null && tourEndDate.compareTo(now) > 0)
+                                    futureTourAdapter.addNewData(documentSnapshot.toObject(Tour.class));
 
-                                    ((FuturePersonalToursAdapter) futureTourAdapter).addNewData(documentSnapshot.toObject(Tour.class));
-                                    futureSwipeRefreshLayout.setRefreshing(false);
-                                }
                                 // the start date and end dates are before now
-                                else if (type.equals("past") && tourStartDate != null && tourStartDate.compareTo(now) < 0 && tourEndDate != null && tourEndDate.compareTo(now) < 0) {
+                                else if (type.equals("past") && tourStartDate != null && tourStartDate.compareTo(now) < 0 && tourEndDate != null && tourEndDate.compareTo(now) < 0)
+                                    pastTourAdapter.addNewData(documentSnapshot.toObject(Tour.class));
 
-                                    ((PastPersonalToursAdapter) pastTourAdapter).addNewData(documentSnapshot.toObject(Tour.class));
-                                    pastSwipeRefreshLayout.setRefreshing(false);
-                                }
+                                currentSwipeRefreshLayout.setRefreshing(false);
+                                futureSwipeRefreshLayout.setRefreshing(false);
+                                pastSwipeRefreshLayout.setRefreshing(false);
 
                                 try {
                                     ((MainActivity)requireActivity()).enableTabs();

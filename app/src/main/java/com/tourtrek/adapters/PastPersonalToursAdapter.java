@@ -1,6 +1,7 @@
 package com.tourtrek.adapters;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -57,7 +58,10 @@ public class PastPersonalToursAdapter extends RecyclerView.Adapter<PastPersonalT
         ((MainActivity) context).findViewById(R.id.personal_past_tours_rv).setVisibility(View.INVISIBLE);
 
         holder.tourName.setText(pastPersonalToursDataSet.get(position).getName());
+        holder.tourName.setTextColor(Color.parseColor("#4E1533"));
         holder.location.setText(pastPersonalToursDataSet.get(position).getLocation());
+        holder.location.setTextColor(Color.parseColor("#4E1533"));
+        holder.itemView.setBackgroundColor(Color.parseColor("#EEEEEE"));
 
         ((MainActivity) context).findViewById(R.id.personal_past_tours_loading_container).setVisibility(View.INVISIBLE);
         ((MainActivity) context).findViewById(R.id.personal_past_tours_rv).setVisibility(View.VISIBLE);
@@ -71,10 +75,14 @@ public class PastPersonalToursAdapter extends RecyclerView.Adapter<PastPersonalT
     /**
      * Adds a new item to our recycler view
      *
-     * @param newTour item to be added
+     * @param tour item to be added
      */
-    public void addNewData(Tour newTour) {
-        pastPersonalToursDataSet.add(newTour);
+    public void addNewData(Tour tour) {
+        for (Tour aTour : pastPersonalToursDataSet) {
+            if (aTour.getTourUID().equals(tour.getTourUID()))
+                return;
+        }
+        pastPersonalToursDataSet.add(tour);
         notifyDataSetChanged();
     }
 

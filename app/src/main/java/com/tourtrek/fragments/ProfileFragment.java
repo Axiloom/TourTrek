@@ -64,6 +64,8 @@ public class ProfileFragment extends Fragment {
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
+        ((MainActivity)requireActivity()).disableTabs();
+
         View profileFragmentView = inflater.inflate(R.layout.fragment_profile, container, false);
 
         // Get instance of Firebase Authentication
@@ -75,7 +77,6 @@ public class ProfileFragment extends Fragment {
             return profileFragmentView;
         }
 
-        // TODO: This is where we will load the users information into their profile
 
         // Set the users username on their profile
         TextView usernameTextView = profileFragmentView.findViewById(R.id.profile_username_tv);
@@ -108,6 +109,9 @@ public class ProfileFragment extends Fragment {
 
         // Setup handler for friends button
         setupAddFriendButtonHandler(profileFragmentView);
+
+        ((MainActivity)requireActivity()).enableTabs();
+
         return profileFragmentView;
     }
 
@@ -162,8 +166,6 @@ public class ProfileFragment extends Fragment {
         Button settingsButton = view.findViewById(R.id.profile_settings_btn);
 
         settingsButton.setOnClickListener(v -> {
-           // Toast.makeText(getContext(), "Test123", Toast.LENGTH_SHORT).show();
-            //TODO: open settings xml
             final FragmentTransaction ft = getParentFragmentManager().beginTransaction();
             ft.replace(R.id.nav_host_fragment, new SettingsFragment(), "SettingsFragment");
             ft.addToBackStack("SettingsFragment").commit();

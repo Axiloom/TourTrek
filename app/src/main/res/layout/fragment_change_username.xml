@@ -10,6 +10,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Change Username"
+        android:textSize="20dp"
+        android:textColor="@color/colorPrimary"
         android:textStyle="bold"
         android:textAlignment="center"/>
 
@@ -35,11 +37,33 @@
         android:textStyle="bold"
         android:visibility="invisible" />
 
-    <Button
-        android:id="@+id/change_username_update_username_btn"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Update Username"
-        android:layout_gravity="center_horizontal"/>
+        android:layout_weight="1.0">
+
+        <Button
+            android:id="@+id/change_username_cancel_btn"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:text="Cancel"
+            android:textColor="#EEEEEE"
+            android:background="@drawable/btn_shape_selector_primary"
+            android:layout_weight="0.5"
+            android:layout_gravity="center_horizontal"/>
+
+        <Button
+            android:id="@+id/change_username_update_username_btn"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:text="Update Username"
+            android:textColor="#EEEEEE"
+            android:background="@drawable/btn_shape_selector_primary"
+            android:layout_weight="0.5"
+            android:layout_gravity="center_horizontal"/>
+
+
+    </LinearLayout>
 
 </LinearLayout>

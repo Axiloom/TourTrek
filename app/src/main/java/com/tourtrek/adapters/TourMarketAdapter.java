@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RatingBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -41,12 +42,14 @@ public class TourMarketAdapter extends RecyclerView.Adapter<TourMarketAdapter.To
         public TextView tourName;
         public ImageView coverImage;
         public TextView location;
+        public RatingBar rating;
 
         public TourMarketViewHolder(View view) {
             super(view);
             this.tourName = view.findViewById(R.id.item_tour_name);
             this.coverImage = view.findViewById(R.id.item_tour_cover_iv);
             this.location = view.findViewById(R.id.item_tour_location);
+            this.rating = view.findViewById(R.id.item_tour_ratingBar);
         }
 
     }
@@ -74,6 +77,7 @@ public class TourMarketAdapter extends RecyclerView.Adapter<TourMarketAdapter.To
 
         holder.tourName.setText(toursDataSet.get(position).getName());
         holder.location.setText(toursDataSet.get(position).getLocation());
+        holder.rating.setRating((float) toursDataSet.get(position).getRating());
 
         Glide.with(context)
                 .load(toursDataSet.get(position).getCoverImageURI())

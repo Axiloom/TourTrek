@@ -1,6 +1,7 @@
 package com.tourtrek.fragments;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +15,7 @@ import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.tasks.OnFailureListener;
@@ -28,6 +30,7 @@ import com.google.rpc.context.AttributeContext;
 import com.tourtrek.R;
 import com.tourtrek.activities.MainActivity;
 import com.tourtrek.data.User;
+import com.tourtrek.utilities.TermsAndConditionsDialogFragment;
 
 //extends preferenceFragmentCompact
 public class SettingsFragment extends Fragment {
@@ -37,8 +40,11 @@ public class SettingsFragment extends Fragment {
     private EditText changePassword1;
     private EditText changePassword2;
     private Button updatePasswordButton;
+    private Button cancelUpdatePasswordButton;
     private Button updateUsernameButton;
+    private Button cancelUpdateUsernameButton;
     private Button updateEmailButton;
+    private Button cancelUpdateEmailButton;
     private boolean nameUpdated = false;
     private boolean EmailUpdated = false;
     private boolean passwordUpdated = false;
@@ -89,6 +95,22 @@ public class SettingsFragment extends Fragment {
         updateEmailButton.setOnClickListener(v -> {
             showChangeEmailDialog();
         });
+
+        Button privacyPolicyButton = view.findViewById(R.id.settings_privacy_policy_btn);
+        privacyPolicyButton.setOnClickListener(v -> {
+            DialogFragment dialogFragment = TermsAndConditionsDialogFragment.newInstance("Privacy Policy");
+            dialogFragment.show(getParentFragmentManager(), "dialog");
+        });
+
+        Button feedbackButton = view.findViewById(R.id.settings_feedback_btn);
+        feedbackButton.setOnClickListener(v -> {
+            Intent intent = new Intent(Intent.ACTION_SEND);
+            intent.setType("plain/text");
+            intent.putExtra(Intent.EXTRA_EMAIL, new String[] { "feedback@tourtrek.com" });
+            intent.putExtra(Intent.EXTRA_SUBJECT, "Feedback");
+            intent.putExtra(Intent.EXTRA_TEXT, "<Enter Feedback Here>");
+            startActivity(Intent.createChooser(intent, "Select Email Client"));
+        });
     }
     private void showChangeUsernameDialog(){
         //set view to fragment_change_username.xml
@@ -102,10 +124,18 @@ public class SettingsFragment extends Fragment {
         //get fields
         EditText newUsername = view.findViewById(R.id.change_username_new_username_et);
         Button updateUsernameButton = view.findViewById(R.id.change_username_update_username_btn);
+        Button cancelUpdateUsernameButton = view.findViewById(R.id.change_username_cancel_btn);
+
         //create update username button listener
         updateUsernameButton.setOnClickListener(v -> {
             updateUsername(newUsername.getText().toString(),errorTextView, dialog);
         });
+        //create cancel update username button listener
+        cancelUpdateUsernameButton.setOnClickListener(v -> {
+            dialog.dismiss();
+        });
+
+
     }
 
     private void updateUsername(String newUsername, TextView errorTextView, AlertDialog dialog) {
@@ -151,7 +181,9 @@ public class SettingsFragment extends Fragment {
         //get fields
         EditText newEmail = view.findViewById(R.id.change_email_new_email_et);
         Button updateEmailButton = view.findViewById(R.id.change_email_update_email_btn);
-        //create update username button listener
+        Button cancelUpdateEmailButton = view.findViewById(R.id.change_email_cancel_btn);
+
+        //create update email button listener
         updateEmailButton.setOnClickListener(v -> {
             if(newEmail.getText().toString().split("@").length == 2 && newEmail.getText().toString().split("@")[1].contains(".") ){
                 updateEmail(newEmail.getText().toString(),errorTextView, dialog);
@@ -161,6 +193,11 @@ public class SettingsFragment extends Fragment {
                         "New email formatted incorrectly", Toast.LENGTH_SHORT).show();
             }
         });
+        //create cancel update email button listener
+        cancelUpdateEmailButton.setOnClickListener(v -> {
+            dialog.dismiss();
+        });
+
     }
 
     private void updateEmail(String newEmail, TextView errorTextView, AlertDialog dialog) {
@@ -217,6 +254,8 @@ public class SettingsFragment extends Fragment {
         EditText passwordEt1 = view.findViewById(R.id.change_password_new_password_et);
         EditText passwordEt2 = view.findViewById(R.id.change_password_confirm_new_password_et);
         Button updatePasswordButton = view.findViewById(R.id.change_password_update_password_btn);
+        Button cancelUpdatePasswordButton = view.findViewById(R.id.change_password_cancel_btn);
+
         TextView errorTextView = view.findViewById(R.id.change_password_error_tv);
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setView(view);
@@ -248,6 +287,12 @@ public class SettingsFragment extends Fragment {
 
             }
         });
+
+        //create cancel update password button listener
+        cancelUpdatePasswordButton.setOnClickListener(v -> {
+            dialog.dismiss();
+        });
+
     }
 
     private void updatePassword(String oldPassword, String newPassword, TextView errorTextView, AlertDialog dialog){

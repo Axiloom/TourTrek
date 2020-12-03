@@ -38,4 +38,25 @@ public class Firestore {
                 });
 
     }
+
+    public static void updateUser(String userUID) {
+
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        db.collection("Users").document(userUID)
+                .set(MainActivity.user)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d(TAG, "User: " + userUID + " successfully updated");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w(TAG, "Error updating user: " + userUID, e);
+                    }
+                });
+
+    }
 }

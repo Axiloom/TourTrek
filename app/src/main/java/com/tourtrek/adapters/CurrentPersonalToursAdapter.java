@@ -1,6 +1,8 @@
 package com.tourtrek.adapters;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -57,7 +59,10 @@ public class CurrentPersonalToursAdapter extends RecyclerView.Adapter<CurrentPer
         ((MainActivity) context).findViewById(R.id.personal_current_tours_rv).setVisibility(View.INVISIBLE);
 
         holder.tourName.setText(currentPersonalToursDataSet.get(position).getName());
+        holder.tourName.setTextColor(Color.parseColor("#4E1533"));
         holder.location.setText(currentPersonalToursDataSet.get(position).getLocation());
+        holder.location.setTextColor(Color.parseColor("#4E1533"));
+        holder.itemView.setBackgroundColor(Color.parseColor("#EEEEEE"));
 
         ((MainActivity) context).findViewById(R.id.personal_current_tours_loading_container).setVisibility(View.INVISIBLE);
         ((MainActivity) context).findViewById(R.id.personal_current_tours_rv).setVisibility(View.VISIBLE);
@@ -80,6 +85,10 @@ public class CurrentPersonalToursAdapter extends RecyclerView.Adapter<CurrentPer
      * @param tour item to be added
      */
     public void addNewData(Tour tour) {
+        for (Tour aTour : currentPersonalToursDataSet) {
+            if (aTour.getTourUID().equals(tour.getTourUID()))
+                return;
+        }
         currentPersonalToursDataSet.add(tour);
         notifyDataSetChanged();
     }

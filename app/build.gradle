@@ -102,6 +102,9 @@ dependencies {
     implementation 'com.google.firebase:firebase-messaging-directboot:21.0.0'
     implementation 'com.google.firebase:firebase-analytics'
 
+    //Facebook share
+    compile 'com.facebook.android:facebook-share:[5,6)'
+
     // Places
     implementation 'com.google.android.libraries.places:places:2.4.0'
 

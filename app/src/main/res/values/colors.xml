@@ -5,5 +5,8 @@
     <color name="colorPrimaryDark">#FF2C44</color>
     <color name="colorSecondary">#FB8445</color>
     <color name="colorSecondaryLight">#F0AA70</color>
+    <color name="colorSecondaryDark">#FF7425</color>
     <color name="colorAccent">#4E1533</color>
+    <color name="colorAccentDark">#3C1533</color>
+
 </resources>

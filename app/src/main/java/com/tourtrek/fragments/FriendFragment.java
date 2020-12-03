@@ -1,10 +1,12 @@
 package com.tourtrek.fragments;
 
+import android.app.AlertDialog;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -21,9 +23,13 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.tourtrek.R;
 import com.tourtrek.activities.MainActivity;
 import com.tourtrek.adapters.FriendsAdapter;
+import com.tourtrek.data.Tour;
 import com.tourtrek.data.User;
 import com.tourtrek.utilities.Firestore;
+import com.tourtrek.utilities.ItemClickSupport;
 import com.tourtrek.utilities.Utilities;
+import com.tourtrek.viewModels.FriendViewModel;
+import com.tourtrek.viewModels.TourViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,17 +37,24 @@ import java.util.List;
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-public class FriendFragment extends Fragment {
+public class FriendFragment extends Fragment implements AdapterView.OnItemSelectedListener{
 
     private static final String TAG = "AddFriendFragment";
     private RecyclerView friendsRecyclerView;
-    private RecyclerView.Adapter friendsAdapter;
     private SwipeRefreshLayout friendsSwipeRefreshLayout;
+    private RecyclerView friendsOfFriendsRecyclerView;
+    private SwipeRefreshLayout friendsOfFriendsSwipeRefreshLayout;
+    private RecyclerView toursOfFriendsRecyclerView;
+    private SwipeRefreshLayout toursOfFriendsSwipeRefreshLayout;
+    private FriendsAdapter friendsAdapter;
 
+    private FriendViewModel friendViewModel;
 
     /**
      * Default for proper back button usage
@@ -66,12 +79,18 @@ public class FriendFragment extends Fragment {
         // Grab a reference to the current view
         View addFriendView = inflater.inflate(R.layout.fragment_add_friend, container, false);
 
+        // Initialize view model
+        friendViewModel = new ViewModelProvider(requireActivity()).get(FriendViewModel.class);
+
+
         // set up the action to carry out via the search button
         setupSearchButton(addFriendView);
 
         // Configure recycler views
-        configureRecyclerViews(addFriendView);
+        friendsRecyclerView = addFriendView.findViewById(R.id.add_friend_my_friends_rv);
+        configureRecyclerViews(friendsRecyclerView);
         configureSwipeRefreshLayouts(addFriendView);
+        configureOnClickRecyclerView();
 
         return addFriendView;
     }
@@ -201,36 +220,33 @@ public class FriendFragment extends Fragment {
     /**
      * Configure the recycler view
      *
-     * @param view current view
+     * @param RV current recycler view needed
      */
-    public void configureRecyclerViews(View view) {
-
-        // Get our recycler view from the layout
-        friendsRecyclerView = view.findViewById(R.id.add_friend_my_friends_rv);
+    public void configureRecyclerViews(RecyclerView RV ) {
 
         // Improves performance because content does not change size
-        friendsRecyclerView.setHasFixedSize(true);
+        RV.setHasFixedSize(true);
 
         // Only load 10 tours before loading more
-        friendsRecyclerView.setItemViewCacheSize(10);
+        RV.setItemViewCacheSize(10);
 
         // Enable drawing cache
-        friendsRecyclerView.setDrawingCacheEnabled(true);
-        friendsRecyclerView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
+        RV.setDrawingCacheEnabled(true);
+        RV.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
 
         // User linear layout manager
         RecyclerView.LayoutManager friendsLayoutManager = new LinearLayoutManager(getContext());
-        friendsRecyclerView.setLayoutManager(friendsLayoutManager);
+        RV.setLayoutManager(friendsLayoutManager);
 
         // Get all friends
         fetchUsersAsync();
 
         // Specify an adapter
         friendsAdapter = new FriendsAdapter(getContext());
-        friendsRecyclerView.setAdapter(friendsAdapter);
+        RV.setAdapter(friendsAdapter);
 
         // Stop showing progressBar when items are loaded
-        friendsRecyclerView
+        RV
                 .getViewTreeObserver()
                 .addOnGlobalLayoutListener(() -> ((FriendsAdapter) friendsAdapter).stopLoading());
 
@@ -248,6 +264,32 @@ public class FriendFragment extends Fragment {
         friendsSwipeRefreshLayout = view.findViewById(R.id.add_friend_my_friends_srl);
         friendsSwipeRefreshLayout.setOnRefreshListener(() -> fetchUsersAsync());
 
+    }
+
+    /**
+     * Enables the click listener for each item in our recycler view
+     */
+    private void configureOnClickRecyclerView() {
+        ItemClickSupport.addTo(friendsRecyclerView, R.layout.item_friend)
+                .setOnItemClickListener(new ItemClickSupport.OnItemClickListener() {
+                    @Override
+                    public void onItemClicked(RecyclerView recyclerView, int position, View v) {
+
+
+                        // Reference to the current tour selected
+                        User friend = friendsAdapter.getData(position);
+
+                        // Add the selected friend to the view model so we can access the friends info inside the fragment
+                        friendViewModel.setSelectedFriend(friend);
+
+                        // Display the friend selected
+                        final FragmentTransaction ft = getParentFragmentManager().beginTransaction();
+                        ft.replace(R.id.nav_host_fragment, new FriendProfileFragment(), "FriendProfileFragment");
+                        ft.addToBackStack("FriendProfileFragment").commit();
+
+
+                    }
+                });
     }
 
 
@@ -303,8 +345,15 @@ public class FriendFragment extends Fragment {
                 });
     }
 
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        Toast.makeText(getActivity(),
+                "clicked on " , Toast.LENGTH_SHORT).show();
 
+    }
 
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
 
-
+    }
 }

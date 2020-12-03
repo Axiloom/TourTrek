@@ -40,8 +40,11 @@ import com.google.android.libraries.places.widget.AutocompleteActivity;
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.model.DocumentKey;
+import com.google.firebase.firestore.model.ResourcePath;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -52,6 +55,7 @@ import com.tourtrek.utilities.Firestore;
 import com.tourtrek.utilities.PlacesLocal;
 import com.tourtrek.utilities.Weather;
 import com.tourtrek.viewModels.AttractionViewModel;
+import com.tourtrek.viewModels.TourViewModel;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -193,86 +197,6 @@ public class MainActivity extends AppCompatActivity {
         TimePickerDialog timePickerDialog = new TimePickerDialog(this, timeSetListener, hour, minute, DateFormat.is24HourFormat(this));
 
         timePickerDialog.show();
-    }
-
-    public void showDatePickerDialog(Button button) {
-
-        final DatePickerDialog.OnDateSetListener dateSetListener = new DatePickerDialog.OnDateSetListener() {
-            @Override
-            public void onDateSet(DatePicker datePicker, int year, int month, int day) {
-
-                String date = (month + 1) + "/" + day + "/" + year;
-                button.setText(date);
-                button.setBackgroundColor(Color.parseColor("#10000000"));
-            }
-        };
-
-        final Calendar calendar = Calendar.getInstance();
-        int year = calendar.get(Calendar.YEAR);
-        int month = calendar.get(Calendar.MONTH);
-        int day = calendar.get(Calendar.DAY_OF_MONTH);
-
-        DatePickerDialog datePickerDialog = new DatePickerDialog(this, dateSetListener, year, month, day);
-
-        datePickerDialog.show();
-    }
-
-    public void showDatePickerDialog(Button button, TextView weather, Context context) {
-
-        final DatePickerDialog.OnDateSetListener dateSetListener = new DatePickerDialog.OnDateSetListener() {
-            @Override
-            public void onDateSet(DatePicker datePicker, int year, int month, int day) {
-
-                String date = (month + 1) + "/" + day + "/" + year;
-                button.setText(date);
-                button.setBackgroundColor(Color.parseColor("#10000000"));
-
-                AttractionViewModel attractionViewModel = new ViewModelProvider((MainActivity)context).get(AttractionViewModel.class);
-
-                // Wait for the weather api to receive the data
-                if (attractionViewModel.getSelectedAttraction().getWeather() != null) {
-
-                    for (Map.Entry<String, String> entry : attractionViewModel.getSelectedAttraction().getWeather().entrySet()) {
-                        String aDateString = entry.getKey();
-
-                        java.text.DateFormat formatter = new SimpleDateFormat("E MMM dd HH:mm:ss z yyyy");
-
-                        Calendar calendar = Calendar.getInstance();
-
-                        try {
-                            Date aDate = formatter.parse(aDateString);
-                            calendar.setTime(aDate);
-                        } catch (ParseException e) {
-                            e.printStackTrace();
-                            Log.e(TAG, "Error converting string date");
-                        }
-
-                        String temperature = entry.getValue();
-
-                        int aMonth = calendar.get(Calendar.MONTH);
-                        int aDay = calendar.get(Calendar.DAY_OF_MONTH);
-                        int aYear = calendar.get(Calendar.YEAR);
-
-                        if (aMonth == month && aDay == day && aYear == year) {
-                            weather.setText(String.format("%s℉", temperature));
-                            break;
-                        }
-                        else
-                            weather.setText("N/A");
-
-                    }
-                }
-            }
-        };
-
-        final Calendar calendar = Calendar.getInstance();
-        int year = calendar.get(Calendar.YEAR);
-        int month = calendar.get(Calendar.MONTH);
-        int day = calendar.get(Calendar.DAY_OF_MONTH);
-
-        DatePickerDialog datePickerDialog = new DatePickerDialog(this, dateSetListener, year, month, day);
-
-        datePickerDialog.show();
     }
 
     /**
