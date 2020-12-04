@@ -35,6 +35,7 @@ import static androidx.test.espresso.matcher.ViewMatchers.*;
 import static androidx.test.espresso.action.ViewActions.*;
 import static java.lang.Thread.sleep;
 import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.is;
 
 
 public class AttractionFragmentTest {
@@ -60,8 +61,8 @@ public class AttractionFragmentTest {
         } finally {
             onView(withId(R.id.navigation_tours)).perform(click());
             onView(isRoot()).perform(waitForView(R.id.login_email_et, TimeUnit.SECONDS.toMillis(1000)));
-            onView(withId(R.id.login_email_et)).perform(typeText("jrawlins@wisc.edu"), closeSoftKeyboard());
-            onView(withId(R.id.login_password_et)).perform(typeText("123456"), closeSoftKeyboard());
+            onView(withId(R.id.login_email_et)).perform(replaceText("jrawlins@wisc.edu"), closeSoftKeyboard());
+            onView(withId(R.id.login_password_et)).perform(replaceText("123456"), closeSoftKeyboard());
             onView(withId(R.id.login_login_btn)).perform(click());
             onView(isRoot()).perform(waitForView(R.id.personal_future_tours_title_btn, TimeUnit.SECONDS.toMillis(1000)));
             sleep(1000); // sleep so that the recycler view to click is loaded
@@ -79,18 +80,20 @@ public class AttractionFragmentTest {
      * https://stackoverflow.com/questions/43149728/select-date-from-calendar-in-android-espresso/43180527
      */
     @Test
-    public void noAttractionNameTest() throws InterruptedException {
+    public void missingInfoTests() throws InterruptedException {
+        // test the case of no attraction name
+//        onView(withId(R.id.tour_add_attraction_btn)).perform(nestedScrollTo());
+//        onView(withId(R.id.tour_add_attraction_btn)).perform(click());
         attractionConditionsTest("noAttraction");
         onView(withText("Not all fields entered")).inRoot(new ToastMatcher()).check(matches(isDisplayed()));
         Espresso.pressBack();
+
+        // save for the very end
         removeAdded();
     }
 
-    /**
-     * An error message should appear when the user inputs no location, but every other field
-     */
     @Test
-    public void noLocationTest() throws InterruptedException {
+    public void noLocation() throws InterruptedException {
         attractionConditionsTest("noLocation");
         onView(withText("Not all fields entered")).inRoot(new ToastMatcher()).check(matches(isDisplayed()));
         Espresso.pressBack();
@@ -98,29 +101,23 @@ public class AttractionFragmentTest {
     }
 
     @Test
-    public void noCostTest() throws InterruptedException {
+    public void noCost() throws InterruptedException {
         attractionConditionsTest("noCost");
         onView(withText("Not all fields entered")).inRoot(new ToastMatcher()).check(matches(isDisplayed()));
         Espresso.pressBack();
         removeAdded();
     }
 
-    /**
-     * An error message should appear when the user inputs no start time, but every other field
-     */
     @Test
-    public void noStartDateTest() throws InterruptedException {
+    public void noStartDate() throws InterruptedException {
         attractionConditionsTest("noStartDate");
-        onView(withText("Not all fields entered")).inRoot(new ToastMatcher()).check(matches(isDisplayed()));
+//        onView(withText("Not all fields entered")).inRoot(new ToastMatcher()).check(matches(isDisplayed()));
         Espresso.pressBack();
         removeAdded();
     }
 
-    /**
-     * An error message should appear when the user inputs no location, but every other field
-     */
     @Test
-    public void noStartTimeTest() throws InterruptedException {
+    public void noStartTime() throws InterruptedException{
         attractionConditionsTest("noStartTime");
         onView(withText("Not all fields entered")).inRoot(new ToastMatcher()).check(matches(isDisplayed()));
         Espresso.pressBack();
@@ -128,37 +125,33 @@ public class AttractionFragmentTest {
     }
 
     @Test
-    public void noEndDateTest() throws InterruptedException {
+    public void noEndDate() throws InterruptedException{
         attractionConditionsTest("noEndDate");
         onView(withText("Not all fields entered")).inRoot(new ToastMatcher()).check(matches(isDisplayed()));
         Espresso.pressBack();
         removeAdded();
     }
 
-    /**
-     * An error message should appear when the user inputs no end time, but every other field
-     */
     @Test
-    public void noEndTimeTest() throws InterruptedException {
+    public void noEndTime() throws InterruptedException{
         attractionConditionsTest("noEndTime");
         onView(withText("Not all fields entered")).inRoot(new ToastMatcher()).check(matches(isDisplayed()));
         Espresso.pressBack();
         removeAdded();
     }
 
-
     @Test
-    public void invalidDatesTest() throws InterruptedException {
-        attractionConditionsTest("invalidDates");
-        onView(withText("Start dates must be before end dates!")).inRoot(new ToastMatcher()).check(matches(isDisplayed()));
+    public void noDescription() throws InterruptedException{
+        attractionConditionsTest("noDescription");
+        onView(withText("Not all fields entered")).inRoot(new ToastMatcher()).check(matches(isDisplayed()));
         Espresso.pressBack();
         removeAdded();
     }
 
     @Test
-    public void noDescriptionTest() throws InterruptedException {
-        attractionConditionsTest("noDescription");
-        onView(withText("Not all fields entered")).inRoot(new ToastMatcher()).check(matches(isDisplayed()));
+    public void invalidDatesTest() throws InterruptedException {
+        attractionConditionsTest("invalidDates");
+        onView(withText("Start dates must be before end dates!")).inRoot(new ToastMatcher()).check(matches(isDisplayed()));
         Espresso.pressBack();
         removeAdded();
     }
@@ -169,7 +162,8 @@ public class AttractionFragmentTest {
     @Test
     public void additionSuccessfulTest() throws InterruptedException {
         attractionConditionsTest("SUCCESSFUL ADDITION");
-        onView(withText("Successfully Added Attraction")).inRoot(new ToastMatcher()).check(matches(isDisplayed()));
+//        onView(withText("Successfully Added Attraction")).inRoot(new ToastMatcher()).check(matches(isDisplayed()));
+//        Espresso.pressBack();
         removeAdded();
     }
 
@@ -221,7 +215,7 @@ public class AttractionFragmentTest {
      * Test for updating an attraction, not making a new one
      */
     @Test
-    public void updatedAttractionTest() throws InterruptedException {
+    public void existingAttractionTests() throws InterruptedException {
         attractionConditionsTest("");
 
         onView(isRoot()).perform(waitForView(R.id.tour_attractions_rv, TimeUnit.SECONDS.toMillis(500)));
@@ -235,17 +229,53 @@ public class AttractionFragmentTest {
 
         // update the attraction name
         onView(isRoot()).perform(waitForView(R.id.attraction_name_et, TimeUnit.SECONDS.toMillis(500)));
-        onView(withId(R.id.attraction_name_et)).perform(typeText("New attraction name"), closeSoftKeyboard());
+        onView(withId(R.id.attraction_name_et)).perform(replaceText("New attraction name"), closeSoftKeyboard());
+
+        // map check
+        onView(withId(R.id.attraction_navigation_btn)).perform(nestedScrollTo(), click());
+        onView(withText("Tap on a marker for navigation.")).inRoot(new ToastMatcher()).check(matches(isDisplayed()));
+        Espresso.pressBack();
 
         // scroll to the "update attraction" button and click it
+        onView(isRoot()).perform(waitForView(R.id.attraction_name_et, TimeUnit.SECONDS.toMillis(500)));
         onView(withId(R.id.attraction_update_btn)).perform(nestedScrollTo());
         onView(withId(R.id.attraction_update_btn)).perform(click());
 
         // check for the proper toast message
-        sleep(500);
+//        sleep(1000);
         onView(withText("Successfully Updated Attraction")).inRoot(new ToastMatcher()).check(matches(isDisplayed()));
 
         // delete the tour and attraction
+        sleep(1000);
+        Espresso.pressBack();
+        removeAdded();
+
+//        // scroll to the "update attraction" button and click it
+//        onView(withId(R.id.attraction_delete_btn)).perform(nestedScrollTo());
+//        onView(withId(R.id.attraction_delete_btn)).perform(click());
+    }
+
+    /**
+     * Test for updating an attraction, not making a new one
+     */
+    @Test
+    public void mapTest() throws InterruptedException {
+        attractionConditionsTest("");
+
+        onView(isRoot()).perform(waitForView(R.id.tour_attractions_rv, TimeUnit.SECONDS.toMillis(500)));
+
+        sleep(500); // give time for the recycler view items to load
+
+        // find the newly made attraction and select it
+        onView(withId(R.id.tour_attractions_rv)).perform(nestedScrollTo());
+        onView(withId(R.id.tour_attractions_rv)).perform(RecyclerViewActions.scrollTo(hasDescendant(withText("Wisconsin Institute for Discovery"))));
+        onView(withId(R.id.tour_attractions_rv)).perform(RecyclerViewActions.actionOnItem(hasDescendant(withText("Wisconsin Institute for Discovery")), click()));
+
+        // map check
+        onView(withId(R.id.attraction_navigation_btn)).perform(nestedScrollTo(), click());
+        onView(withText("Tap on a marker for navigation.")).inRoot(new ToastMatcher()).check(matches(isDisplayed()));
+
+        Espresso.pressBack();
         Espresso.pressBack();
         removeAdded();
 
@@ -286,6 +316,8 @@ public class AttractionFragmentTest {
     }
 
     /**
+     *  Increase coverage of FocusChangeListeners by clicking on fields on then clicking away to another before entering anything.
+     *  This applies to editable text fields. Hitting the second if statement block with dates and times seems not to be possible.
      * Helper method to minimize duplicate code
      * Possible conditions include:
      * noAttraction
@@ -299,21 +331,23 @@ public class AttractionFragmentTest {
      * invalidDates
      * @param condition
      */
+
     private void attractionConditionsTest(String condition) throws InterruptedException {
         // attraction name
-        if (condition.equals("noAttraction")){ onView(withId(R.id.attraction_name_et)).perform(typeText(""), closeSoftKeyboard()); }
-        else { onView(withId(R.id.attraction_name_et)).perform(typeText("Some attraction"), closeSoftKeyboard()); }
+        onView(withId(R.id.attraction_name_et)).perform(nestedScrollTo()); // the field to be modified must be in view
+        if (condition.equals("noAttraction")){ onView(withId(R.id.attraction_name_et)).perform(replaceText(""), closeSoftKeyboard()); }
+        else { onView(withId(R.id.attraction_name_et)).perform(replaceText("Some attraction"), closeSoftKeyboard()); }
 
         // location
         onView(withId(R.id.attraction_location_et)).perform(nestedScrollTo());
 //        if (condition.equals("noLocation")){onView(withId(R.id.attraction_location_et)).perform(typeText(""), closeSoftKeyboard()); }
 //        else {onView(withId(R.id.attraction_location_et)).perform(typeText("330 N. Orchard St., Madison, WI, USA"), closeSoftKeyboard()); }
-        if (condition.equals("noLocation") || condition.equals("noAttraction") ){}
-        else {
+        if (!(condition.equals("noLocation") || condition.equals("noAttraction"))) {
             onView(withId(R.id.attraction_search_ib)).perform(click());
             sleep(1000);
-            onView(withId(R.id.places_autocomplete_search_bar)).perform(typeText("Wisconsin Institute for Discovery"));
+            onView(withId(R.id.places_autocomplete_search_bar)).perform(replaceText("Wisconsin Institute for Discovery"));
             sleep(1000);
+            onView(isRoot()).perform(waitForView(R.id.places_autocomplete_content, TimeUnit.SECONDS.toMillis(30)));
             ViewInteraction recyclerView = onView(
                     allOf(withId(R.id.places_autocomplete_list),
                             childAtPosition(
@@ -325,13 +359,14 @@ public class AttractionFragmentTest {
         // cost
         onView(isRoot()).perform(waitForView(R.id.attraction_name_et, TimeUnit.SECONDS.toMillis(30)));
         onView(withId(R.id.attraction_cost_et)).perform(nestedScrollTo());
-        if (condition.equals("noCost")){onView(withId(R.id.attraction_cost_et)).perform(typeText(""), closeSoftKeyboard());}
-        else {onView(withId(R.id.attraction_cost_et)).perform(typeText("0"), closeSoftKeyboard());}
+        if (condition.equals("noCost")){onView(withId(R.id.attraction_cost_et)).perform(replaceText(""), closeSoftKeyboard());}
+        else {onView(withId(R.id.attraction_cost_et)).perform(replaceText("0"), closeSoftKeyboard());}
 
         // description
+
         onView(withId(R.id.attraction_description_et)).perform(nestedScrollTo());
-        if (condition.equals("noDescription")){onView(withId(R.id.attraction_description_et)).perform(typeText(""), closeSoftKeyboard());}
-        else {onView(withId(R.id.attraction_description_et)).perform(typeText("Random sample description"), closeSoftKeyboard());}
+        if (condition.equals("noDescription")){onView(withId(R.id.attraction_description_et)).perform(replaceText(""), closeSoftKeyboard());}
+        else {onView(withId(R.id.attraction_description_et)).perform(replaceText("Random sample description"), closeSoftKeyboard());}
 
         // set the start date
         onView(withId(R.id.attraction_start_date_btn)).perform(nestedScrollTo());
@@ -376,20 +411,23 @@ public class AttractionFragmentTest {
         sleep(1000);
     }
 
+    @Test
+    public void textChangeListenerTests(){
+        onView(withId(R.id.attraction_name_et)).perform(nestedScrollTo(), click());
+        onView(withId(R.id.attraction_cost_et)).perform(nestedScrollTo(), click());
+        onView(withId(R.id.attraction_description_et)).perform(nestedScrollTo());
+        onView(withId(R.id.attraction_name_et)).perform(nestedScrollTo(), click());
+    }
+
     /**
      *
      */
     private void removeAdded() throws InterruptedException {
         // find the newly made attraction and select it
-        onView(isRoot()).perform(waitForView(R.id.tour_attractions_rv, TimeUnit.SECONDS.toMillis(30)));
-        sleep(1000);
+        onView(isRoot()).perform(waitForView(R.id.tour_name_et, TimeUnit.SECONDS.toMillis(30)));
         onView(withId(R.id.tour_delete_btn)).perform(nestedScrollTo());
         onView(withId(R.id.tour_delete_btn)).perform(click());
     }
-
-    // TODO - test for the attraction location marker
-    // TODO - test for either a starting location marker appearing or the toast saying that user location data could not be found
-    // TODO - test for the toast telling the user to tap on a marker
 
 
     /**

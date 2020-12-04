@@ -19,19 +19,19 @@
 <tr>
 <td>
 <div class="infoBox" id="tests">
-<div class="counter">53</div>
+<div class="counter">50</div>
 <p>tests</p>
 </div>
 </td>
 <td>
 <div class="infoBox" id="failures">
-<div class="counter">0</div>
+<div class="counter">6</div>
 <p>failures</p>
 </div>
 </td>
 <td>
 <div class="infoBox" id="duration">
-<div class="counter">15m23.53s</div>
+<div class="counter">15m51.00s</div>
 <p>duration</p>
 </div>
 </td>
@@ -40,8 +40,8 @@
 </div>
 </td>
 <td>
-<div class="infoBox success" id="successRate">
-<div class="percent">100%</div>
+<div class="infoBox failures" id="successRate">
+<div class="percent">88%</div>
 <p>successful</p>
 </div>
 </td>
@@ -51,13 +51,77 @@
 <div id="tabs">
 <ul class="tabLinks">
 <li>
-<a href="#tab0">Packages</a>
+<a href="#tab0">Failed tests</a>
 </li>
 <li>
-<a href="#tab1">Classes</a>
+<a href="#tab1">Packages</a>
+</li>
+<li>
+<a href="#tab2">Classes</a>
 </li>
 </ul>
 <div id="tab0" class="tab">
+<h2>Failed tests</h2>
+<ul class="linkList">
+<table>
+<thead>
+<tr>
+<th>Class</th>
+<th>Test</th>
+</tr>
+</thead>
+<tr>
+<td class="failures">
+<a href="com.tourtrek.AttractionFragmentTest.html">AttractionFragmentTest</a>
+</td>
+<td class="failures">
+<a href="com.tourtrek.AttractionFragmentTest.html#existingAttractionTests">existingAttractionTests</a>
+</td>
+</tr>
+<tr>
+<td class="failures">
+<a href="com.tourtrek.AttractionFragmentTest.html">AttractionFragmentTest</a>
+</td>
+<td class="failures">
+<a href="com.tourtrek.AttractionFragmentTest.html#invalidDatesTest">invalidDatesTest</a>
+</td>
+</tr>
+<tr>
+<td class="failures">
+<a href="com.tourtrek.FriendFragmentTest.html">FriendFragmentTest</a>
+</td>
+<td class="failures">
+<a href="com.tourtrek.FriendFragmentTest.html#addFriendAlreadyExisted">addFriendAlreadyExisted</a>
+</td>
+</tr>
+<tr>
+<td class="failures">
+<a href="com.tourtrek.FriendFragmentTest.html">FriendFragmentTest</a>
+</td>
+<td class="failures">
+<a href="com.tourtrek.FriendFragmentTest.html#deleteFriendSuccessfully">deleteFriendSuccessfully</a>
+</td>
+</tr>
+<tr>
+<td class="failures">
+<a href="com.tourtrek.TourFragmentTest.html">TourFragmentTest</a>
+</td>
+<td class="failures">
+<a href="com.tourtrek.TourFragmentTest.html#additionSuccessfulTest">additionSuccessfulTest</a>
+</td>
+</tr>
+<tr>
+<td class="failures">
+<a href="com.tourtrek.activities.MapFragmentTest.html">MapFragmentTest</a>
+</td>
+<td class="failures">
+<a href="com.tourtrek.activities.MapFragmentTest.html#mapFragmentTest">mapFragmentTest</a>
+</td>
+</tr>
+</table>
+</ul>
+</div>
+<div id="tab1" class="tab">
 <h2>Packages</h2>
 <table>
 <thead>
@@ -71,18 +135,27 @@
 </thead>
 <tbody>
 <tr>
-<td class="success">
+<td class="failures">
 <a href="com.tourtrek.html">com.tourtrek</a>
 </td>
-<td>53</td>
-<td>0</td>
-<td>15m23.53s</td>
-<td class="success">100%</td>
+<td>49</td>
+<td>5</td>
+<td>15m3.28s</td>
+<td class="failures">89%</td>
+</tr>
+<tr>
+<td class="failures">
+<a href="com.tourtrek.activities.html">com.tourtrek.activities</a>
+</td>
+<td>1</td>
+<td>1</td>
+<td>47.722s</td>
+<td class="failures">0%</td>
 </tr>
 </tbody>
 </table>
 </div>
-<div id="tab1" class="tab">
+<div id="tab2" class="tab">
 <h2>Classes</h2>
 <table>
 <thead>
@@ -96,19 +169,27 @@
 </thead>
 <tbody>
 <tr>
-<td class="success"/>
+<td class="failures"/>
 <a href="com.tourtrek.AttractionFragmentTest.html">com.tourtrek.AttractionFragmentTest</a>
-<td>12</td>
-<td>0</td>
-<td>7m47.30s</td>
-<td class="success">100%</td>
+<td>14</td>
+<td>2</td>
+<td>6m19.79s</td>
+<td class="failures">85%</td>
+</tr>
+<tr>
+<td class="failures"/>
+<a href="com.tourtrek.FriendFragmentTest.html">com.tourtrek.FriendFragmentTest</a>
+<td>4</td>
+<td>2</td>
+<td>1m57.07s</td>
+<td class="failures">50%</td>
 </tr>
 <tr>
 <td class="success"/>
 <a href="com.tourtrek.LoginFragmentTest.html">com.tourtrek.LoginFragmentTest</a>
 <td>3</td>
 <td>0</td>
-<td>31.630s</td>
+<td>31.511s</td>
 <td class="success">100%</td>
 </tr>
 <tr>
@@ -116,7 +197,7 @@
 <a href="com.tourtrek.PersonalToursFragmentTest.html">com.tourtrek.PersonalToursFragmentTest</a>
 <td>3</td>
 <td>0</td>
-<td>1m10.94s</td>
+<td>1m10.72s</td>
 <td class="success">100%</td>
 </tr>
 <tr>
@@ -124,31 +205,23 @@
 <a href="com.tourtrek.RegistrationFragmentTest.html">com.tourtrek.RegistrationFragmentTest</a>
 <td>8</td>
 <td>0</td>
-<td>3m8.32s</td>
+<td>3m33.11s</td>
 <td class="success">100%</td>
 </tr>
 <tr>
-<td class="success"/>
-<a href="com.tourtrek.SearchAttractionsTest.html">com.tourtrek.SearchAttractionsTest</a>
-<td>8</td>
-<td>0</td>
-<td>0.132s</td>
-<td class="success">100%</td>
-</tr>
-<tr>
-<td class="success"/>
+<td class="failures"/>
 <a href="com.tourtrek.TourFragmentTest.html">com.tourtrek.TourFragmentTest</a>
-<td>7</td>
-<td>0</td>
-<td>2m34.83s</td>
-<td class="success">100%</td>
+<td>5</td>
+<td>1</td>
+<td>1m17.56s</td>
+<td class="failures">80%</td>
 </tr>
 <tr>
 <td class="success"/>
 <a href="com.tourtrek.TourMarketFragmentTest.html">com.tourtrek.TourMarketFragmentTest</a>
 <td>11</td>
 <td>0</td>
-<td>0.102s</td>
+<td>0.448s</td>
 <td class="success">100%</td>
 </tr>
 <tr>
@@ -156,8 +229,16 @@
 <a href="com.tourtrek.UploadImageTest.html">com.tourtrek.UploadImageTest</a>
 <td>1</td>
 <td>0</td>
-<td>10.285s</td>
+<td>13.078s</td>
 <td class="success">100%</td>
+</tr>
+<tr>
+<td class="failures"/>
+<a href="com.tourtrek.activities.MapFragmentTest.html">com.tourtrek.activities.MapFragmentTest</a>
+<td>1</td>
+<td>1</td>
+<td>47.722s</td>
+<td class="failures">0%</td>
 </tr>
 </tbody>
 </table>
@@ -165,7 +246,7 @@
 </div>
 <div id="footer">
 <p>Generated by 
-<a href="http://www.gradle.org">Gradle 6.5</a> at Dec 2, 2020 10:53:22 PM</p>
+<a href="http://www.gradle.org">Gradle 6.5</a> at Dec 4, 2020 1:17:07 AM</p>
 </div>
 </div>
 </body>

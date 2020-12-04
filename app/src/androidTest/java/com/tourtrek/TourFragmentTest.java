@@ -21,6 +21,7 @@ import org.junit.Test;
 import java.util.concurrent.TimeUnit;
 
 import androidx.test.core.app.ActivityScenario;
+import androidx.test.espresso.Espresso;
 import androidx.test.espresso.ViewAction;
 import androidx.test.espresso.action.ViewActions;
 import androidx.test.espresso.contrib.PickerActions;
@@ -31,6 +32,7 @@ import androidx.test.uiautomator.UiObjectNotFoundException;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.action.ViewActions.closeSoftKeyboard;
+import static androidx.test.espresso.action.ViewActions.replaceText;
 import static androidx.test.espresso.action.ViewActions.scrollTo;
 import static androidx.test.espresso.action.ViewActions.typeText;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
@@ -68,12 +70,11 @@ public class TourFragmentTest {
         } finally {
             onView(withId(R.id.navigation_tours)).perform(click());
             onView(isRoot()).perform(waitForView(R.id.login_email_et, TimeUnit.SECONDS.toMillis(20)));
-            onView(withId(R.id.login_email_et)).perform(typeText("cctest@gmail.com"), closeSoftKeyboard());
-            onView(withId(R.id.login_password_et)).perform(typeText("123456"), closeSoftKeyboard());
+            onView(withId(R.id.login_email_et)).perform(replaceText("cctest@gmail.com"), closeSoftKeyboard());
+            onView(withId(R.id.login_password_et)).perform(replaceText("123456"), closeSoftKeyboard());
             onView(withId(R.id.login_login_btn)).perform(click());
             onView(isRoot()).perform(waitForView(R.id.personal_future_tours_title_btn, TimeUnit.SECONDS.toMillis(20)));
             onView(withId(R.id.personal_future_tours_title_btn)).perform(click());
-
         }
     }
 
@@ -83,48 +84,44 @@ public class TourFragmentTest {
      * https://stackoverflow.com/questions/43149728/select-date-from-calendar-in-android-espresso/43180527
      */
     @Test
-    public void noTourNameTest() {
+    public void noTourNameTest() throws InterruptedException {
         tourConditionsTest("noTourName");
         onView(withText("Not all fields entered")).inRoot(new ToastMatcher()).check(matches(isDisplayed()));
-    }
 
-    /**
-     * An error message should appear when the user inputs no location, but every other field
-     */
-    @Test
-    public void noLocationTest() {
         tourConditionsTest("noLocation");
         onView(withText("Not all fields entered")).inRoot(new ToastMatcher()).check(matches(isDisplayed()));
-    }
 
-    @Test
-    public void noCostTest() {
         tourConditionsTest("noCost");
         onView(withText("Not all fields entered")).inRoot(new ToastMatcher()).check(matches(isDisplayed()));
+
+        removeAdded();
     }
+
 
     /**
      * An error message should appear when the user inputs no start time, but every other field
      */
     @Test
-    public void noStartDateTest() {
+    public void noStartDateTest() throws InterruptedException {
         tourConditionsTest("noStartDate");
         onView(withText("Not all fields entered")).inRoot(new ToastMatcher()).check(matches(isDisplayed()));
+        removeAdded();
     }
 
 
-
     @Test
-    public void noEndDateTest() {
+    public void noEndDateTest() throws InterruptedException {
         tourConditionsTest("noEndDate");
         onView(withText("Not all fields entered")).inRoot(new ToastMatcher()).check(matches(isDisplayed()));
+        removeAdded();
     }
 
 
     @Test
-    public void invalidTimeTest() {
+    public void invalidTimeTest() throws InterruptedException {
         tourConditionsTest("invalidTime");
         onView(withText("Start dates must be before end dates!")).inRoot(new ToastMatcher()).check(matches(isDisplayed()));
+        removeAdded();
     }
 
 
@@ -140,10 +137,10 @@ public class TourFragmentTest {
 
         // find the newly made attraction and select it
         onView(withId(R.id.personal_past_tours_rv)).perform(RecyclerViewActions.actionOnItemAtPosition(0,click()));
-        onView(isRoot()).perform(waitForView(R.id.tour_delete_btn, TimeUnit.SECONDS.toMillis(20)));
-        onView(withId(R.id.tour_delete_btn)).perform(nestedScrollTo());
-        onView(withId(R.id.tour_delete_btn)).perform(click());
 
+        navigationWithoutAttractions(); // test navigation
+
+        removeAdded();
 
     }
 
@@ -233,18 +230,19 @@ public class TourFragmentTest {
      */
     private void tourConditionsTest(String condition){
         // attraction name
-        if (condition.equals("noTourName")){ onView(withId(R.id.tour_name_et)).perform(typeText(""), closeSoftKeyboard()); }
-        else { onView(withId(R.id.tour_name_et)).perform(typeText("Some tour"), closeSoftKeyboard()); }
+        onView(withId(R.id.tour_name_et)).perform(nestedScrollTo());
+        if (condition.equals("noTourName")){ onView(withId(R.id.tour_name_et)).perform(replaceText(""), closeSoftKeyboard()); }
+        else { onView(withId(R.id.tour_name_et)).perform(replaceText("Some tour"), closeSoftKeyboard()); }
 
         // location
         onView(withId(R.id.tour_location_et)).perform(nestedScrollTo());
-        if (condition.equals("noLocation")){onView(withId(R.id.tour_location_et)).perform(typeText(""), closeSoftKeyboard()); }
-        else {onView(withId(R.id.tour_location_et)).perform(typeText("330 N. Orchard St., Madison, WI, USA"), closeSoftKeyboard()); }
+        if (condition.equals("noLocation")){onView(withId(R.id.tour_location_et)).perform(replaceText(""), closeSoftKeyboard()); }
+        else {onView(withId(R.id.tour_location_et)).perform(replaceText("330 N. Orchard St., Madison, WI, USA"), closeSoftKeyboard()); }
 
         // cost
         onView(withId(R.id.tour_cost_et)).perform(nestedScrollTo());
-        if (condition.equals("noCost")){onView(withId(R.id.tour_cost_et)).perform(typeText(""), closeSoftKeyboard());}
-        else {onView(withId(R.id.tour_cost_et)).perform(typeText("0"), closeSoftKeyboard());}
+        if (condition.equals("noCost")){onView(withId(R.id.tour_cost_et)).perform(replaceText(""), closeSoftKeyboard());}
+        else {onView(withId(R.id.tour_cost_et)).perform(replaceText("0"), closeSoftKeyboard());}
 
 
         // set the start date
@@ -280,10 +278,28 @@ public class TourFragmentTest {
         onView(withId(R.id.tour_update_btn)).perform(click());
     }
 
-    // TODO check for the navigation toast message when a tour map is displayed
-    // TODO check for the no location found toast message when a tour map is displayed and the user has no personal location data
-    // TODO check for my navigation markers
+    // Generic navigation test
+    public void navigationWithoutAttractions() throws InterruptedException {
+        onView(isRoot()).perform(waitForView(R.id.tour_name_et, TimeUnit.SECONDS.toMillis(500)));
 
+        sleep(500); // give time for the recycler view items to load
+
+        // map check
+        onView(withId(R.id.tour_navigation_btn)).perform(nestedScrollTo(), click());
+        sleep(300);
+        onView(withText("No were attractions displayed - try adding some!")).inRoot(new ToastMatcher()).check(matches(isDisplayed()));
+        sleep(300);
+        Espresso.pressBack();
+    }
+    /**
+     *
+     */
+    private void removeAdded() throws InterruptedException {
+        // find the newly made attraction and select it
+        onView(isRoot()).perform(waitForView(R.id.tour_name_et, TimeUnit.SECONDS.toMillis(30)));
+        onView(withId(R.id.tour_delete_btn)).perform(nestedScrollTo());
+        onView(withId(R.id.tour_delete_btn)).perform(click());
+    }
     /**
      * For dates and times
      * @param parentMatcher

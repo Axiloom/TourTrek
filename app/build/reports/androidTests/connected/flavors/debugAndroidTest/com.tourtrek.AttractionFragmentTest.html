@@ -22,19 +22,19 @@
 <tr>
 <td>
 <div class="infoBox" id="tests">
-<div class="counter">12</div>
+<div class="counter">14</div>
 <p>tests</p>
 </div>
 </td>
 <td>
 <div class="infoBox" id="failures">
-<div class="counter">0</div>
+<div class="counter">2</div>
 <p>failures</p>
 </div>
 </td>
 <td>
 <div class="infoBox" id="duration">
-<div class="counter">7m47.30s</div>
+<div class="counter">6m19.79s</div>
 <p>duration</p>
 </div>
 </td>
@@ -43,8 +43,8 @@
 </div>
 </td>
 <td>
-<div class="infoBox success" id="successRate">
-<div class="percent">100%</div>
+<div class="infoBox failures" id="successRate">
+<div class="percent">85%</div>
 <p>successful</p>
 </div>
 </td>
@@ -54,10 +54,57 @@
 <div id="tabs">
 <ul class="tabLinks">
 <li>
-<a href="#tab0">Tests</a>
+<a href="#tab0">Failed tests</a>
+</li>
+<li>
+<a href="#tab1">Tests</a>
 </li>
 </ul>
 <div id="tab0" class="tab">
+<h2>Failed tests</h2>
+<div class="test">
+<a name="existingAttractionTests"></a>
+<h3 class="failures">existingAttractionTests</h3>
+<span class="code">
+<pre>androidx.test.espresso.NoMatchingViewException: No views in hierarchy found matching: with text: is &quot;Successfully Updated Attraction&quot;
+
+View Hierarchy:
++&gt;LinearLayout{id=-1, visibility=VISIBLE, width=849, height=172, has-focus=false, has-focusable=false, has-window-focus=false, is-clickable=false, is-enabled=true, is-focused=false, is-focusable=false, is-layout-requested=false, is-selected=false, layout-params={(0,84)(wrapxwrap) gr=BOTTOM CENTER ty=TOAST fmt=TRANSLUCENT wanim=0x1030004
+fl=NOT_FOCUSABLE NOT_TOUCHABLE KEEP_SCREEN_ON HARDWARE_ACCELERATED}, tag=null, root-is-layout-requested=false, has-input-connection=false, x=0.0, y=0.0, child-count=1}
+|
++-&gt;AppCompatTextView{id=16908299, res-name=message, visibility=VISIBLE, width=681, height=66, has-focus=false, has-focusable=false, has-window-focus=false, is-clickable=false, is-enabled=true, is-focused=false, is-focusable=false, is-layout-requested=false, is-selected=false, layout-params=android.widget.LinearLayout$LayoutParams@c1d8ac9, tag=null, root-is-layout-requested=false, has-input-connection=false, x=84.0, y=53.0, text=Tap on a marker for navigation., input-type=0, ime-target=false, has-links=false}
+|
+at dalvik.system.VMStack.getThreadStackTrace(Native Method)
+at java.lang.Thread.getStackTrace(Thread.java:1720)
+at androidx.test.espresso.base.DefaultFailureHandler.getUserFriendlyError(DefaultFailureHandler.java:12)
+at androidx.test.espresso.base.DefaultFailureHandler.handle(DefaultFailureHandler.java:7)
+at androidx.test.espresso.ViewInteraction.waitForAndHandleInteractionResults(ViewInteraction.java:8)
+at androidx.test.espresso.ViewInteraction.check(ViewInteraction.java:12)
+at com.tourtrek.AttractionFragmentTest.existingAttractionTests(AttractionFragmentTest.java:246)
+</pre>
+</span>
+</div>
+<div class="test">
+<a name="invalidDatesTest"></a>
+<h3 class="failures">invalidDatesTest</h3>
+<span class="code">
+<pre>androidx.test.espresso.NoMatchingRootException: Matcher 'is toast' did not match any of the following roots: [Root{application-window-token=android.view.ViewRootImpl$W@cda0214, window-token=android.view.ViewRootImpl$W@cda0214, has-window-focus=true, layout-params-type=1, layout-params-string={(0,0)(fillxfill) sim={adjust=resize} ty=BASE_APPLICATION wanim=0x10302fe
+fl=LAYOUT_IN_SCREEN LAYOUT_INSET_DECOR SPLIT_TOUCH HARDWARE_ACCELERATED DRAWS_SYSTEM_BAR_BACKGROUNDS
+pfl=FORCE_DRAW_STATUS_BAR_BACKGROUND}, decor-view-string=DecorView{id=-1, visibility=VISIBLE, width=1440, height=2560, has-focus=false, has-focusable=true, has-window-focus=true, is-clickable=false, is-enabled=true, is-focused=false, is-focusable=false, is-layout-requested=false, is-selected=false, layout-params={(0,0)(fillxfill) sim={adjust=resize} ty=BASE_APPLICATION wanim=0x10302fe
+fl=LAYOUT_IN_SCREEN LAYOUT_INSET_DECOR SPLIT_TOUCH HARDWARE_ACCELERATED DRAWS_SYSTEM_BAR_BACKGROUNDS
+pfl=FORCE_DRAW_STATUS_BAR_BACKGROUND}, tag=null, root-is-layout-requested=false, has-input-connection=false, x=0.0, y=0.0, child-count=3}}]
+at dalvik.system.VMStack.getThreadStackTrace(Native Method)
+at java.lang.Thread.getStackTrace(Thread.java:1720)
+at androidx.test.espresso.base.DefaultFailureHandler.getUserFriendlyError(DefaultFailureHandler.java:12)
+at androidx.test.espresso.base.DefaultFailureHandler.handle(DefaultFailureHandler.java:7)
+at androidx.test.espresso.ViewInteraction.waitForAndHandleInteractionResults(ViewInteraction.java:8)
+at androidx.test.espresso.ViewInteraction.check(ViewInteraction.java:12)
+at com.tourtrek.AttractionFragmentTest.invalidDatesTest(AttractionFragmentTest.java:154)
+</pre>
+</span>
+</div>
+</div>
+<div id="tab1" class="tab">
 <h2>Tests</h2>
 <table>
 <thead>
@@ -68,58 +115,66 @@
 </thead>
 <tr>
 <td>additionSuccessfulTest</td>
-<td class="success">passed (45.805s)</td>
+<td class="success">passed (23.340s)</td>
 </tr>
 <tr>
 <td>deletionTest</td>
-<td class="success">passed (40.629s)</td>
+<td class="success">passed (27.468s)</td>
+</tr>
+<tr>
+<td>existingAttractionTests</td>
+<td class="failures">failed (33.203s)</td>
 </tr>
 <tr>
 <td>invalidDatesTest</td>
-<td class="success">passed (46.475s)</td>
+<td class="failures">failed (1m27.31s)</td>
 </tr>
 <tr>
-<td>noAttractionNameTest</td>
-<td class="success">passed (26.458s)</td>
+<td>mapTest</td>
+<td class="success">passed (24.262s)</td>
 </tr>
 <tr>
-<td>noCostTest</td>
-<td class="success">passed (40.106s)</td>
+<td>missingInfoTests</td>
+<td class="success">passed (16.981s)</td>
 </tr>
 <tr>
-<td>noDescriptionTest</td>
-<td class="success">passed (36.689s)</td>
+<td>noCost</td>
+<td class="success">passed (22.286s)</td>
 </tr>
 <tr>
-<td>noEndDateTest</td>
-<td class="success">passed (39.997s)</td>
+<td>noDescription</td>
+<td class="success">passed (26.852s)</td>
 </tr>
 <tr>
-<td>noEndTimeTest</td>
-<td class="success">passed (37.899s)</td>
+<td>noEndDate</td>
+<td class="success">passed (18.800s)</td>
 </tr>
 <tr>
-<td>noLocationTest</td>
-<td class="success">passed (31.268s)</td>
+<td>noEndTime</td>
+<td class="success">passed (23.682s)</td>
 </tr>
 <tr>
-<td>noStartDateTest</td>
-<td class="success">passed (37.219s)</td>
+<td>noLocation</td>
+<td class="success">passed (16.417s)</td>
 </tr>
 <tr>
-<td>noStartTimeTest</td>
-<td class="success">passed (37.316s)</td>
+<td>noStartDate</td>
+<td class="success">passed (28.676s)</td>
 </tr>
 <tr>
-<td>updatedAttractionTest</td>
-<td class="success">passed (47.436s)</td>
+<td>noStartTime</td>
+<td class="success">passed (20.278s)</td>
+</tr>
+<tr>
+<td>textChangeListenerTests</td>
+<td class="success">passed (10.230s)</td>
 </tr>
 </table>
 </div>
 </div>
 <div id="footer">
 <p>Generated by 
-<a href="http://www.gradle.org">Gradle 6.5</a> at Dec 2, 2020 10:53:23 PM</p>
+<a href="http://www.gradle.org">Gradle 6.5</a> at Dec 4, 2020 1:17:07 AM</p>
 </div>
 </div>
 </body>

@@ -76,6 +76,9 @@ public class MapsFragment extends Fragment {
             // Just a tour is selected
             if (tourViewModel.getSelectedTour() != null && attractionViewModel.getSelectedAttraction() == null){
                 addTourMarkers(googleMap);
+                if (tourViewModel.getSelectedTour().getAttractions().size() == 0){
+                    Toast.makeText(getActivity(), "No were attractions displayed - try adding some!", Toast.LENGTH_LONG).show();
+                }
                 return;
             }
 

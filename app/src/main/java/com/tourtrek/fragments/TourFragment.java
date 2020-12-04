@@ -685,6 +685,9 @@ public class TourFragment extends Fragment implements AdapterView.OnItemSelected
                                 swipeRefreshLayout.setRefreshing(false);
 
                             }
+                        })
+                        .addOnFailureListener(v -> {
+                           Log.d("TourFragment", "Failure in fetchAttractionsAsync");
                         });
 
             }
@@ -992,7 +995,7 @@ public class TourFragment extends Fragment implements AdapterView.OnItemSelected
                         .addOnFailureListener(new OnFailureListener() {
                             @Override
                             public void onFailure(@NonNull Exception e) {
-
+                                Log.d("TourFragment", "Failure setting attraction dates to null");
                             }
                         });
             }
