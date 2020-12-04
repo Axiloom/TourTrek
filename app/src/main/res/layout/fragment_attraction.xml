@@ -388,8 +388,8 @@
 
                 <Button
                     android:id="@+id/attraction_update_btn"
-                    android:layout_width="426dp"
-                    android:layout_height="74dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
                     android:layout_marginBottom="8dp"
                     android:layout_marginEnd="24dp"
                     android:layout_marginStart="24dp"
@@ -403,24 +403,8 @@
                     android:visibility="gone" />
 
                 <Button
-                    android:id="@+id/attraction_delete_btn"
-                    android:layout_width="422dp"
-                    android:layout_height="78dp"
-                    android:layout_marginBottom="8dp"
-                    android:layout_marginEnd="24dp"
-                    android:layout_marginStart="24dp"
-                    android:background="@drawable/btn_shape_selector_white"
-                    android:enabled="true"
-                    android:text="Delete Attraction"
-                    android:textAlignment="center"
-                    android:textAllCaps="false"
-                    android:textColor="@color/colorPrimary"
-                    android:textSize="28dp"
-                    android:visibility="gone" />
-
-                <Button
                     android:id="@+id/attraction_navigation_btn"
-                    android:layout_width="422dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="8dp"
                     android:layout_marginEnd="24dp"
@@ -433,6 +417,22 @@
                     android:textColor="@color/colorPrimary"
                     android:textSize="28dp"
                     android:visibility="gone" />
+
+                <Button
+                    android:id="@+id/attraction_delete_btn"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="24dp"
+                    android:layout_marginStart="24dp"
+                    android:background="@drawable/btn_shape_selector_accent"
+                    android:enabled="true"
+                    android:text="Delete Attraction"
+                    android:textAlignment="center"
+                    android:textAllCaps="false"
+                    android:textColor="#EEEEEE"
+                    android:textSize="28dp"
+                    android:visibility="gone" />
+
 
             </LinearLayout>
 
